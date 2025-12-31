@@ -167,7 +167,7 @@ clean:
 
 ### Example Projects
 
-See example games and projects that use this engine for reference implementations.
+- **[Asteroids](https://github.com/andrealaforgia/asteroids)** - A classic arcade-style asteroids game implementation showcasing the engine's capabilities for vector graphics, physics, and input handling.
 
 ## Cloning a Project with This Engine
 
