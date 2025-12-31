@@ -7,8 +7,8 @@
  * for decoupled communication between game systems.
  */
 
-#ifndef ENGINE_CORE_EVENTS_EVENT_SYSTEM_H_
-#define ENGINE_CORE_EVENTS_EVENT_SYSTEM_H_
+#ifndef CORE_EVENTS_EVENT_SYSTEM_H_
+#define CORE_EVENTS_EVENT_SYSTEM_H_
 
 #include <stddef.h>
 
@@ -48,4 +48,4 @@ void unsubscribe(event_system_ptr system, int event_type,
 void publish(event_system_ptr system, const game_event_t* event);
 void destroy_event_system(event_system_ptr system);
 
-#endif  // ENGINE_CORE_EVENTS_EVENT_SYSTEM_H_
+#endif  // CORE_EVENTS_EVENT_SYSTEM_H_

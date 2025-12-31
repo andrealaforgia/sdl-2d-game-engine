@@ -7,8 +7,8 @@
  * and maintains a free list for fast object reuse without heap operations.
  */
 
-#ifndef ENGINE_CORE_MEMORY_OBJECT_POOL_H_
-#define ENGINE_CORE_MEMORY_OBJECT_POOL_H_
+#ifndef CORE_MEMORY_OBJECT_POOL_H_
+#define CORE_MEMORY_OBJECT_POOL_H_
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -59,4 +59,4 @@ typedef void (*pool_callback_t)(void* object, size_t index, void* user_data);
 void pool_foreach_active(object_pool_t* pool, pool_callback_t callback,
                          void* user_data);
 
-#endif  // ENGINE_CORE_MEMORY_OBJECT_POOL_H_
+#endif  // CORE_MEMORY_OBJECT_POOL_H_

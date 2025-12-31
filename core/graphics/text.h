@@ -7,8 +7,8 @@
  * dimensions for layout purposes.
  */
 
-#ifndef ENGINE_CORE_GRAPHICS_TEXT_H_
-#define ENGINE_CORE_GRAPHICS_TEXT_H_
+#ifndef CORE_GRAPHICS_TEXT_H_
+#define CORE_GRAPHICS_TEXT_H_
 
 #include <SDL.h>
 
@@ -28,4 +28,4 @@ point_t write_text(const graphics_context_ptr graphics_context, const char* s,
 point_t write_number(const graphics_context_ptr graphics_context,
                      const point_t position, int number, int scale);
 
-#endif  // ENGINE_CORE_GRAPHICS_TEXT_H_
+#endif  // CORE_GRAPHICS_TEXT_H_

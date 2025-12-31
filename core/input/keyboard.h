@@ -7,8 +7,8 @@
  * state for each monitored key to ensure clean input detection.
  */
 
-#ifndef ENGINE_CORE_INPUT_KEYBOARD_H_
-#define ENGINE_CORE_INPUT_KEYBOARD_H_
+#ifndef CORE_INPUT_KEYBOARD_H_
+#define CORE_INPUT_KEYBOARD_H_
 
 #include <SDL.h>
 #include <stdbool.h>
@@ -37,4 +37,4 @@ bool is_s_key_pressed(const keyboard_state_ptr keyboard_state);
 bool is_return_key_pressed(const keyboard_state_ptr keyboard_state);
 bool is_f11_key_pressed(const keyboard_state_ptr keyboard_state);
 
-#endif  // ENGINE_CORE_INPUT_KEYBOARD_H_
+#endif  // CORE_INPUT_KEYBOARD_H_

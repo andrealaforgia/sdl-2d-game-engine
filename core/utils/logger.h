@@ -7,8 +7,8 @@
  * with consistent categorization across the codebase.
  */
 
-#ifndef ENGINE_CORE_UTILS_LOGGER_H_
-#define ENGINE_CORE_UTILS_LOGGER_H_
+#ifndef CORE_UTILS_LOGGER_H_
+#define CORE_UTILS_LOGGER_H_
 
 #include <SDL.h>
 #include <SDL_mixer.h>
@@ -47,4 +47,4 @@
 #define LOG_WARN_FMT(fmt, ...) \
   SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, fmt, __VA_ARGS__)
 
-#endif  // ENGINE_CORE_UTILS_LOGGER_H_
+#endif  // CORE_UTILS_LOGGER_H_

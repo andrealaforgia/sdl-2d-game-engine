@@ -7,8 +7,8 @@
  * coordinate deltas and brightness values.
  */
 
-#ifndef ENGINE_CORE_GRAPHICS_COORDS_H_
-#define ENGINE_CORE_GRAPHICS_COORDS_H_
+#ifndef CORE_GRAPHICS_COORDS_H_
+#define CORE_GRAPHICS_COORDS_H_
 
 typedef struct {
   int lower;
@@ -21,4 +21,4 @@ typedef struct {
   int brightness;
 } coords_t;
 
-#endif  // ENGINE_CORE_GRAPHICS_COORDS_H_
+#endif  // CORE_GRAPHICS_COORDS_H_

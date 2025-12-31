@@ -7,8 +7,8 @@
  * Handles screen wrapping, coordinate transformations, and display modes.
  */
 
-#ifndef ENGINE_CORE_GRAPHICS_GRAPHICS_H_
-#define ENGINE_CORE_GRAPHICS_GRAPHICS_H_
+#ifndef CORE_GRAPHICS_GRAPHICS_H_
+#define CORE_GRAPHICS_GRAPHICS_H_
 
 #include <SDL.h>
 #include <stdbool.h>
@@ -58,4 +58,4 @@ bool out_of_bounds(const graphics_context_ptr graphics_context,
 point_t random_point_around(const point_ptr point, int min_tolerance,
                             int max_tolerance);
 
-#endif  // ENGINE_CORE_GRAPHICS_GRAPHICS_H_
+#endif  // CORE_GRAPHICS_GRAPHICS_H_

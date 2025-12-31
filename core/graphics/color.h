@@ -7,8 +7,8 @@
  * in 0xRRGGBB format.
  */
 
-#ifndef ENGINE_CORE_GRAPHICS_COLOR_H_
-#define ENGINE_CORE_GRAPHICS_COLOR_H_
+#ifndef CORE_GRAPHICS_COLOR_H_
+#define CORE_GRAPHICS_COLOR_H_
 
 #include "inline.h"
 
@@ -31,4 +31,4 @@
 
 typedef int color_t;
 
-#endif  // ENGINE_CORE_GRAPHICS_COLOR_H_
+#endif  // CORE_GRAPHICS_COLOR_H_

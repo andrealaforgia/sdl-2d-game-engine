@@ -7,8 +7,8 @@
  * adjusting volume levels for all audio channels.
  */
 
-#ifndef ENGINE_CORE_AUDIO_AUDIO_H_
-#define ENGINE_CORE_AUDIO_AUDIO_H_
+#ifndef CORE_AUDIO_AUDIO_H_
+#define CORE_AUDIO_AUDIO_H_
 
 #include <SDL_mixer.h>
 #include <stdbool.h>
@@ -34,4 +34,4 @@ void set_audio_volume(int volume);
 // Clean up and free all audio resources
 void terminate_audio_context(const audio_context_ptr audio_context);
 
-#endif  // ENGINE_CORE_AUDIO_AUDIO_H_
+#endif  // CORE_AUDIO_AUDIO_H_

@@ -7,8 +7,8 @@
  * user input and system events like quit requests.
  */
 
-#ifndef ENGINE_CORE_INPUT_EVENTS_H_
-#define ENGINE_CORE_INPUT_EVENTS_H_
+#ifndef CORE_INPUT_EVENTS_H_
+#define CORE_INPUT_EVENTS_H_
 
 typedef enum {
   NO_EVENT = 0,
@@ -19,4 +19,4 @@ typedef enum {
 
 event_t poll_event(void);
 
-#endif  // ENGINE_CORE_INPUT_EVENTS_H_
+#endif  // CORE_INPUT_EVENTS_H_

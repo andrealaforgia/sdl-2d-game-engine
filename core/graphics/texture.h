@@ -3,8 +3,8 @@
  * @brief Texture loading and management for SDL
  */
 
-#ifndef ENGINE_CORE_GRAPHICS_TEXTURE_H_
-#define ENGINE_CORE_GRAPHICS_TEXTURE_H_
+#ifndef CORE_GRAPHICS_TEXTURE_H_
+#define CORE_GRAPHICS_TEXTURE_H_
 
 #include <SDL.h>
 #include <stdbool.h>
@@ -17,6 +17,7 @@ typedef struct {
 
 texture_t load_texture(SDL_Renderer* renderer, const char* filepath);
 void free_texture(texture_ptr tex);
-void render_texture(SDL_Renderer* renderer, const texture_ptr tex, int x, int y);
+void render_texture(SDL_Renderer* renderer, const texture_ptr tex, int x,
+                    int y);
 
-#endif  // ENGINE_CORE_GRAPHICS_TEXTURE_H_
+#endif  // CORE_GRAPHICS_TEXTURE_H_

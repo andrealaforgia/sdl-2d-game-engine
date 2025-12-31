@@ -7,8 +7,8 @@
  * displaying FPS information on screen.
  */
 
-#ifndef ENGINE_CORE_GRAPHICS_FPS_TRACKER_H_
-#define ENGINE_CORE_GRAPHICS_FPS_TRACKER_H_
+#ifndef CORE_GRAPHICS_FPS_TRACKER_H_
+#define CORE_GRAPHICS_FPS_TRACKER_H_
 
 #include <stdlib.h>
 
@@ -21,4 +21,4 @@ fps_tracker_t create_fps_tracker(void);
 void track_fps(const fps_tracker_ptr fps_tracker);
 void format_fps(const fps_tracker_ptr fps_tracker, char* s, size_t n);
 
-#endif  // ENGINE_CORE_GRAPHICS_FPS_TRACKER_H_
+#endif  // CORE_GRAPHICS_FPS_TRACKER_H_

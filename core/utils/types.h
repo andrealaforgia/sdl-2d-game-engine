@@ -1,5 +1,5 @@
-#ifndef ENGINE_CORE_UTILS_TYPES_H_
-#define ENGINE_CORE_UTILS_TYPES_H_
+#ifndef CORE_UTILS_TYPES_H_
+#define CORE_UTILS_TYPES_H_
 
 #include <stdint.h>
 
@@ -25,4 +25,4 @@ typedef enum {
   ENTITY_SCALE_LARGE = 6
 } entity_scale_t;
 
-#endif  // ENGINE_CORE_UTILS_TYPES_H_
+#endif  // CORE_UTILS_TYPES_H_

@@ -7,8 +7,8 @@
  * and validation for all supported command-line flags.
  */
 
-#ifndef ENGINE_CORE_UTILS_COMMAND_LINE_H_
-#define ENGINE_CORE_UTILS_COMMAND_LINE_H_
+#ifndef CORE_UTILS_COMMAND_LINE_H_
+#define CORE_UTILS_COMMAND_LINE_H_
 
 #include <stdbool.h>
 
@@ -29,4 +29,4 @@ typedef struct {
 command_line_options_t parse_command_line_options(int argc, char* argv[]);
 void print_help(void);
 
-#endif  // ENGINE_CORE_UTILS_COMMAND_LINE_H_
+#endif  // CORE_UTILS_COMMAND_LINE_H_
