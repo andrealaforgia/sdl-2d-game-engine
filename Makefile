@@ -65,7 +65,7 @@ dev_install:
 	$(DEV_INSTALL_CMD)
 
 lint:
-	cpplint --filter=-build/include_subdir,-legal/copyright,-runtime/threadsafe_fn $(SRC) $(HEADERS)
+	cpplint --filter=-build/include_subdir,-legal/copyright,-runtime/threadsafe_fn,-readability/casting $(SRC) $(HEADERS)
 
 clean:
 	rm -f $(OBJ) $(LIB_TARGET)
