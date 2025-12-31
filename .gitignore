@@ -1,0 +1,32 @@
+# Compiled Object files
+*.o
+*.obj
+
+# Static libraries
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+
+# Debug files
+*.dSYM/
+*.su
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Build directories
+build/
+bin/
+lib/
