@@ -11,7 +11,8 @@
 
 // Construct full path to a sound file
 static char* get_sound_path(const char* base_path, const char* sound_file) {
-  size_t path_len = strlen(base_path) + strlen(sound_file) + 2;  // +2 for "/" and null terminator
+  // +2 for "/" and null terminator
+  size_t path_len = strlen(base_path) + strlen(sound_file) + 2;
   char* full_path = malloc(path_len);
   if (full_path) {
     snprintf(full_path, path_len, "%s/%s", base_path, sound_file);
