@@ -11,10 +11,10 @@
 
 // Construct full path to a sound file
 static char* get_sound_path(const char* base_path, const char* sound_file) {
-  size_t path_len = strlen(base_path) + strlen(sound_file) + 1;
+  size_t path_len = strlen(base_path) + strlen(sound_file) + 2;  // +2 for "/" and null terminator
   char* full_path = malloc(path_len);
   if (full_path) {
-    snprintf(full_path, path_len, "%s%s", base_path, sound_file);
+    snprintf(full_path, path_len, "%s/%s", base_path, sound_file);
   }
   return full_path;
 }
@@ -65,8 +65,11 @@ bool load_sound(audio_context_ptr audio_context, int index,
     return false;
   }
 
+  LOG_INFO_FMT("Loading sound: %s", full_path);
+
   Mix_Chunk* chunk = Mix_LoadWAV(full_path);
   if (!chunk) {
+    LOG_ERROR_FMT("Failed to load sound: %s", full_path);
     LOG_MIX_ERROR(full_path);
     LOG_WARN("Game will continue without this sound effect");
     free(full_path);
@@ -74,22 +77,29 @@ bool load_sound(audio_context_ptr audio_context, int index,
   }
 
   audio_context->chunks[index] = chunk;
+  LOG_INFO_FMT("Successfully loaded sound at index %d", index);
   free(full_path);
   return true;
 }
 
-ALWAYS_INLINE void play_sound(const audio_context_ptr audio_context,
-                               int index) {
+void play_sound(const audio_context_ptr audio_context, int index) {
   if (!audio_context || !audio_context->chunks) {
+    LOG_WARN("Invalid audio context in play_sound");
     return;
   }
 
   if (index < 0 || index >= audio_context->max_sounds) {
+    LOG_WARN_FMT("Sound index %d out of bounds", index);
     return;
   }
 
   if (audio_context->chunks[index]) {
-    Mix_PlayChannel(-1, audio_context->chunks[index], 0);
+    int channel = Mix_PlayChannel(-1, audio_context->chunks[index], 0);
+    if (channel == -1) {
+      LOG_WARN_FMT("Failed to play sound %d: %s", index, Mix_GetError());
+    }
+  } else {
+    LOG_WARN_FMT("Sound at index %d not loaded", index);
   }
 }
 

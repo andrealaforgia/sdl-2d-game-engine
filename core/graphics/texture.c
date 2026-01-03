@@ -20,6 +20,10 @@ texture_t load_texture(SDL_Renderer* renderer, const char* filepath) {
     return tex;
   }
 
+  // Set black color (RGB 0,0,0) as transparent
+  Uint32 black = SDL_MapRGB(surface->format, 0, 0, 0);
+  SDL_SetColorKey(surface, SDL_TRUE, black);
+
   tex.texture = SDL_CreateTextureFromSurface(renderer, surface);
   if (!tex.texture) {
     LOG_ERROR_FMT("Failed to create texture from %s: %s", filepath,
