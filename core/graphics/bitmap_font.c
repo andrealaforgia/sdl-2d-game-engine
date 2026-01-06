@@ -9,6 +9,7 @@
 static bool get_char_sprite_rect(char c, int* out_x, int* out_y,
                                    int char_width, int char_height,
                                    int row_spacing) {
+  (void)char_height;  // Suppress unused parameter warning
   c = toupper(c);
 
   // Row 1: A-O (0-14)

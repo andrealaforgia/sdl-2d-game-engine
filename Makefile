@@ -40,7 +40,7 @@ OBJ = $(SRC:.c=.o)
 INCLUDES = -I. \
            -I$(CORE_GRAPHICS_DIR) -I$(CORE_MATH_DIR) -I$(CORE_INPUT_DIR) -I$(CORE_AUDIO_DIR) -I$(CORE_TIME_DIR) -I$(CORE_UTILS_DIR) -I$(CORE_MEMORY_DIR) -I$(CORE_EVENTS_DIR)
 
-CFLAGS := -ggdb3 -Ofast --std=c99 -Wall -Wextra -pedantic-errors $(INCLUDES) $(SDL2_CFLAGS)
+CFLAGS := -ggdb3 -O3 -ffast-math --std=c99 -Wall -Wextra -pedantic-errors $(INCLUDES) $(SDL2_CFLAGS)
 LFLAGS := $(SDL2_LFLAGS) -lm
 
 # Library target for the engine

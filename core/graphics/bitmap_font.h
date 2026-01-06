@@ -36,7 +36,7 @@ typedef struct {
   int char_width;   // Width of each character in pixels
   int char_height;  // Height of each character in pixels
   int row_spacing;  // Vertical spacing between character rows
-  int color_offset; // Vertical offset between color variations
+  int color_offset;  // Vertical offset between color variations
 } bitmap_font_t, *bitmap_font_ptr;
 
 /**
