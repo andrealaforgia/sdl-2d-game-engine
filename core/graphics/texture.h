@@ -9,6 +9,7 @@
 #include <SDL.h>
 #include <stdbool.h>
 
+#include "graphics_context.h"
 #include "graphics.h"
 
 typedef struct {

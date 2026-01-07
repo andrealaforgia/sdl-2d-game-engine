@@ -6,15 +6,15 @@
  * geometric primitives to the screen. Separated from graphics.c for better modularity.
  */
 
-#ifndef ENGINE_CORE_GRAPHICS_DRAWING_PRIMITIVES_H_
-#define ENGINE_CORE_GRAPHICS_DRAWING_PRIMITIVES_H_
+#ifndef CORE_GRAPHICS_DRAWING_PRIMITIVES_H_
+#define CORE_GRAPHICS_DRAWING_PRIMITIVES_H_
 
 #include <SDL.h>
 #include <stdint.h>
+
 #include "color.h"
 #include "geometry.h"
-
-// graphics_context_ptr typedef is provided by graphics.h before this include
+#include "graphics_context.h"
 
 /**
  * @brief Draw a line between two coordinate points
@@ -25,7 +25,8 @@
  * @param y2 Ending y coordinate
  * @param color Line color
  */
-void draw_line(const graphics_context_ptr graphics_context, int x1, int y1, int x2, int y2, color_t color);
+void draw_line(const graphics_context_ptr graphics_context, int x1, int y1,
+               int x2, int y2, color_t color);
 
 /**
  * @brief Draw a thick line with enhanced visibility
@@ -36,7 +37,8 @@ void draw_line(const graphics_context_ptr graphics_context, int x1, int y1, int 
  * @param y2 Ending y coordinate
  * @param color Line color
  */
-void draw_thick_line(const graphics_context_ptr graphics_context, int x1, int y1, int x2, int y2, color_t color);
+void draw_thick_line(const graphics_context_ptr graphics_context, int x1,
+                     int y1, int x2, int y2, color_t color);
 
 /**
  * @brief Draw a line between two point structures
@@ -45,7 +47,9 @@ void draw_thick_line(const graphics_context_ptr graphics_context, int x1, int y1
  * @param p2 Ending point
  * @param color Line color
  */
-void draw_line_between_points(const graphics_context_ptr graphics_context, const point_ptr p1, const point_ptr p2, color_t color);
+void draw_line_between_points(const graphics_context_ptr graphics_context,
+                              const point_ptr p1, const point_ptr p2,
+                              color_t color);
 
 /**
  * @brief Draw a single pixel at specified coordinates
@@ -54,7 +58,8 @@ void draw_line_between_points(const graphics_context_ptr graphics_context, const
  * @param y Y coordinate
  * @param color Pixel color
  */
-void draw_pixel(const graphics_context_ptr graphics_context, int x, int y, color_t color);
+void draw_pixel(const graphics_context_ptr graphics_context, int x, int y,
+                color_t color);
 
 /**
  * @brief Draw a single pixel at a point structure location
@@ -62,7 +67,8 @@ void draw_pixel(const graphics_context_ptr graphics_context, int x, int y, color
  * @param p Point location
  * @param color Pixel color
  */
-void draw_point(const graphics_context_ptr graphics_context, const point_ptr p, color_t color);
+void draw_point(const graphics_context_ptr graphics_context,
+                const point_ptr p, color_t color);
 
 /**
  * @brief Draw a fat pixel (5x5 square) for enhanced visibility
@@ -70,7 +76,8 @@ void draw_point(const graphics_context_ptr graphics_context, const point_ptr p, 
  * @param p Point location center
  * @param color Pixel color
  */
-void draw_fat_pixel(const graphics_context_ptr graphics_context, const point_ptr p, color_t color);
+void draw_fat_pixel(const graphics_context_ptr graphics_context,
+                    const point_ptr p, color_t color);
 
 /**
  * @brief Draw a circle using optimized point rendering
@@ -80,7 +87,9 @@ void draw_fat_pixel(const graphics_context_ptr graphics_context, const point_ptr
  * @param radius Circle radius
  * @param color Circle color
  */
-void draw_circle(const graphics_context_ptr graphics_context, int32_t centreX, int32_t centreY, int32_t radius, color_t color);
+void draw_circle(const graphics_context_ptr graphics_context,
+                 int32_t centreX, int32_t centreY, int32_t radius,
+                 color_t color);
 
 /**
  * @brief Draw a filled polygon using triangle fan approach
@@ -89,7 +98,9 @@ void draw_circle(const graphics_context_ptr graphics_context, int32_t centreX, i
  * @param num_points Number of vertices in polygon
  * @param fill_color Fill color for polygon
  */
-void draw_filled_polygon(const graphics_context_ptr graphics_context, const SDL_Point* points, int num_points, color_t fill_color);
+void draw_filled_polygon(const graphics_context_ptr graphics_context,
+                         const SDL_Point* points, int num_points,
+                         color_t fill_color);
 
 /**
  * @brief Initialize circle drawing lookup tables for performance
@@ -99,4 +110,4 @@ void draw_filled_polygon(const graphics_context_ptr graphics_context, const SDL_
  */
 void init_circle_lookup(void);
 
-#endif  // ENGINE_CORE_GRAPHICS_DRAWING_PRIMITIVES_H_
+#endif  // CORE_GRAPHICS_DRAWING_PRIMITIVES_H_

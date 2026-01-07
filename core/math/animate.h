@@ -11,6 +11,7 @@
 #define CORE_MATH_ANIMATE_H_
 
 #include "geometry.h"
+#include "graphics_context.h"
 #include "graphics.h"
 #include "physics.h"
 

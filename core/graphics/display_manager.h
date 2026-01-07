@@ -6,13 +6,13 @@
  * Handles SDL display queries, fullscreen toggling, and display information reporting.
  */
 
-#ifndef ENGINE_CORE_GRAPHICS_DISPLAY_MANAGER_H_
-#define ENGINE_CORE_GRAPHICS_DISPLAY_MANAGER_H_
+#ifndef CORE_GRAPHICS_DISPLAY_MANAGER_H_
+#define CORE_GRAPHICS_DISPLAY_MANAGER_H_
 
 #include <SDL.h>
 #include <stdbool.h>
 
-// graphics_context_ptr typedef is provided by graphics.h before this include
+#include "graphics_context.h"
 
 /**
  * @brief Get the number of available video displays
@@ -26,7 +26,8 @@ int get_display_count(void);
  * @param p_display_mode_count Output parameter for number of modes found
  * @return Array of display modes (must be freed), or NULL on error
  */
-SDL_DisplayMode* get_display_modes(int display_index, int* p_display_mode_count);
+SDL_DisplayMode* get_display_modes(int display_index,
+                                   int* p_display_mode_count);
 
 /**
  * @brief Print comprehensive graphics and display information
@@ -45,4 +46,4 @@ void print_graphics_info(void);
  */
 void toggle_fullscreen(const graphics_context_ptr graphics_context);
 
-#endif  // ENGINE_CORE_GRAPHICS_DISPLAY_MANAGER_H_
+#endif  // CORE_GRAPHICS_DISPLAY_MANAGER_H_

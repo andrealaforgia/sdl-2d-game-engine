@@ -6,8 +6,8 @@
  * Extracted from the god object graphics.c for better separation of concerns.
  */
 
-#ifndef ENGINE_CORE_GRAPHICS_GRAPHICS_CONTEXT_H_
-#define ENGINE_CORE_GRAPHICS_GRAPHICS_CONTEXT_H_
+#ifndef CORE_GRAPHICS_GRAPHICS_CONTEXT_H_
+#define CORE_GRAPHICS_GRAPHICS_CONTEXT_H_
 
 #include <SDL.h>
 #include <stdbool.h>
@@ -38,7 +38,8 @@ bool initialize_graphics_subsystems(void);
  * @param sdl_display_mode Output SDL display mode structure
  * @return true if validation successful, false otherwise
  */
-bool validate_display_configuration(int* display, int* display_mode, SDL_DisplayMode* sdl_display_mode);
+bool validate_display_configuration(int* display, int* display_mode,
+                                    SDL_DisplayMode* sdl_display_mode);
 
 /**
  * @brief Create game window with specified configuration
@@ -50,9 +51,10 @@ bool validate_display_configuration(int* display, int* display_mode, SDL_Display
  * @param display_mode SDL display mode for fullscreen
  * @return Created window or NULL on failure
  */
-SDL_Window* create_application_window(const char* title, window_mode_t window_mode, 
-                                     int display, int width, int height, 
-                                     SDL_DisplayMode* display_mode);
+SDL_Window* create_application_window(const char* title,
+                                      window_mode_t window_mode,
+                                      int display, int width, int height,
+                                      SDL_DisplayMode* display_mode);
 
 /**
  * @brief Create game renderer with hardware fallback
@@ -60,7 +62,8 @@ SDL_Window* create_application_window(const char* title, window_mode_t window_mo
  * @param vsync Enable vertical synchronization
  * @return Created renderer or NULL on failure
  */
-SDL_Renderer* create_application_renderer(SDL_Window* window, bool vsync);
+SDL_Renderer* create_application_renderer(SDL_Window* window,
+                                           bool vsync);
 
 /**
  * @brief Initialize complete graphics context
@@ -70,8 +73,10 @@ SDL_Renderer* create_application_renderer(SDL_Window* window, bool vsync);
  * @param vsync Enable vertical synchronization
  * @return Initialized graphics context
  */
-graphics_context_t initialize_graphics_context(int display, int display_mode,
-                                              window_mode_t window_mode, bool vsync);
+graphics_context_t initialize_graphics_context(int display,
+                                               int display_mode,
+                                               window_mode_t window_mode,
+                                               bool vsync);
 
 /**
  * @brief Cleanup and shutdown graphics context
@@ -79,4 +84,4 @@ graphics_context_t initialize_graphics_context(int display, int display_mode,
  */
 void terminate_graphics_context(graphics_context_t* context);
 
-#endif  // ENGINE_CORE_GRAPHICS_GRAPHICS_CONTEXT_H_
+#endif  // CORE_GRAPHICS_GRAPHICS_CONTEXT_H_

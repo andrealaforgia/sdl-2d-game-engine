@@ -4,9 +4,10 @@
  */
 
 #include "color.h"
-#include "inline.h"
 
 #include <stdlib.h>
+
+#include "inline.h"
 
 ALWAYS_INLINE color_t random_color(void) {
   // Generate vibrant colors by using predefined bright color palette

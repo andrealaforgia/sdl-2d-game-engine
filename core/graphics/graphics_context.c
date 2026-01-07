@@ -4,11 +4,13 @@
  */
 
 #include "graphics_context.h"
-#include "graphics.h"
-#include "geometry.h"
+
 #include <SDL.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "graphics.h"
+#include "geometry.h"
 
 // Logging macros - simplified for context module
 #define LOG_INFO(msg) printf("INFO: %s\n", msg)
@@ -16,7 +18,8 @@
 #define LOG_WARN(msg) printf("WARN: %s\n", msg)
 #define LOG_WARN_FMT(fmt, ...) printf("WARN: " fmt "\n", __VA_ARGS__)
 #define LOG_ERROR(msg) printf("ERROR: %s\n", msg)
-#define LOG_SDL_ERROR(func) printf("ERROR: %s failed: %s\n", func, SDL_GetError())
+#define LOG_SDL_ERROR(func) \
+  printf("ERROR: %s failed: %s\n", func, SDL_GetError())
 
 bool initialize_graphics_subsystems(void) {
   if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -62,7 +65,8 @@ bool initialize_graphics_subsystems(void) {
   return true;
 }
 
-bool validate_display_configuration(int* display, int* display_mode, SDL_DisplayMode* sdl_display_mode) {
+bool validate_display_configuration(int* display, int* display_mode,
+                                    SDL_DisplayMode* sdl_display_mode) {
   // Validate display index
   int num_displays = SDL_GetNumVideoDisplays();
   if (num_displays < 1) {
@@ -71,7 +75,8 @@ bool validate_display_configuration(int* display, int* display_mode, SDL_Display
   }
 
   if (*display < 0 || *display >= num_displays) {
-    LOG_WARN_FMT("Invalid display index %d (valid range: 0-%d)", *display, num_displays - 1);
+    LOG_WARN_FMT("Invalid display index %d (valid range: 0-%d)", *display,
+                 num_displays - 1);
     LOG_INFO("Falling back to display 0");
     *display = 0;
   }
@@ -84,8 +89,9 @@ bool validate_display_configuration(int* display, int* display_mode, SDL_Display
   }
 
   if (*display_mode < 0 || *display_mode >= num_modes) {
-    LOG_WARN_FMT("Invalid display mode %d for display %d (valid range: 0-%d)",
-                 *display_mode, *display, num_modes - 1);
+    LOG_WARN_FMT(
+        "Invalid display mode %d for display %d (valid range: 0-%d)",
+        *display_mode, *display, num_modes - 1);
     LOG_INFO("Falling back to display mode 0");
     *display_mode = 0;
   }
@@ -97,13 +103,13 @@ bool validate_display_configuration(int* display, int* display_mode, SDL_Display
 
   LOG_INFO_FMT("Display Mode: w=%d h=%d refresh=%d", sdl_display_mode->w,
                sdl_display_mode->h, sdl_display_mode->refresh_rate);
-  
   return true;
 }
 
-SDL_Window* create_application_window(const char* title, window_mode_t window_mode, 
-                                     int display, int width, int height, 
-                                     SDL_DisplayMode* display_mode) {
+SDL_Window* create_application_window(const char* title,
+                                      window_mode_t window_mode,
+                                      int display, int width, int height,
+                                      SDL_DisplayMode* display_mode) {
   Uint32 window_flags = SDL_WINDOW_ALLOW_HIGHDPI;
 
   // Configure window flags based on mode
@@ -117,7 +123,8 @@ SDL_Window* create_application_window(const char* title, window_mode_t window_mo
       LOG_INFO("Window mode: Fullscreen");
       break;
     case BORDERLESS:
-      window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_BORDERLESS;
+      window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP |
+                      SDL_WINDOW_BORDERLESS;
       LOG_INFO("Window mode: Borderless");
       break;
     case MAXIMIZED:
@@ -126,9 +133,10 @@ SDL_Window* create_application_window(const char* title, window_mode_t window_mo
       break;
   }
 
-  SDL_Window* window = SDL_CreateWindow(
-      title, SDL_WINDOWPOS_CENTERED_DISPLAY(display),
-      SDL_WINDOWPOS_CENTERED_DISPLAY(display), width, height, window_flags);
+  SDL_Window* window =
+      SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED_DISPLAY(display),
+                       SDL_WINDOWPOS_CENTERED_DISPLAY(display), width,
+                       height, window_flags);
 
   if (!window) {
     LOG_SDL_ERROR("SDL_CreateWindow");
@@ -143,7 +151,7 @@ SDL_Window* create_application_window(const char* title, window_mode_t window_mo
       return NULL;
     }
   }
-  
+
   return window;
 }
 
@@ -157,7 +165,8 @@ SDL_Renderer* create_application_renderer(SDL_Window* window, bool vsync) {
   SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, renderer_flags);
 
   if (!renderer) {
-    LOG_WARN("Hardware-accelerated renderer failed, trying software renderer");
+    LOG_WARN(
+        "Hardware-accelerated renderer failed, trying software renderer");
     LOG_SDL_ERROR("SDL_CreateRenderer (hardware)");
 
     // Try software renderer as fallback
@@ -173,7 +182,8 @@ SDL_Renderer* create_application_renderer(SDL_Window* window, bool vsync) {
       LOG_ERROR("Failed to create any renderer - aborting");
       return NULL;
     } else {
-      LOG_INFO("Using software renderer (performance may be reduced)");
+      LOG_INFO(
+          "Using software renderer (performance may be reduced)");
     }
   }
 
@@ -181,7 +191,6 @@ SDL_Renderer* create_application_renderer(SDL_Window* window, bool vsync) {
   SDL_RendererInfo renderer_info;
   if (SDL_GetRendererInfo(renderer, &renderer_info) == 0) {
     LOG_INFO_FMT("Renderer: %s", renderer_info.name);
-    
     if (renderer_info.flags & SDL_RENDERER_ACCELERATED) {
       LOG_INFO("Renderer: Hardware-accelerated");
     } else {
@@ -202,8 +211,10 @@ SDL_Renderer* create_application_renderer(SDL_Window* window, bool vsync) {
   return renderer;
 }
 
-graphics_context_t initialize_graphics_context(int display, int display_mode,
-                                              window_mode_t window_mode, bool vsync) {
+graphics_context_t initialize_graphics_context(int display,
+                                               int display_mode,
+                                               window_mode_t window_mode,
+                                               bool vsync) {
   graphics_context_t context = {0};
 
   if (!initialize_graphics_subsystems()) {
@@ -211,22 +222,26 @@ graphics_context_t initialize_graphics_context(int display, int display_mode,
   }
 
   SDL_DisplayMode sdl_display_mode;
-  if (!validate_display_configuration(&display, &display_mode, &sdl_display_mode)) {
+  if (!validate_display_configuration(&display, &display_mode,
+                                      &sdl_display_mode)) {
     return context;
   }
 
   context.screen_width = sdl_display_mode.w;
   context.screen_height = sdl_display_mode.h;
-  context.screen_center = point(context.screen_width / 2, context.screen_height / 2);
+  context.screen_center = point(context.screen_width / 2,
+                                context.screen_height / 2);
 
-  context.window = create_application_window("Asteroids", window_mode, display, 
-                                           context.screen_width, context.screen_height, 
-                                           &sdl_display_mode);
+  context.window =
+      create_application_window("Asteroids", window_mode, display,
+                                context.screen_width, context.screen_height,
+                                &sdl_display_mode);
   if (!context.window) {
     return context;
   }
 
-  context.renderer = create_application_renderer(context.window, vsync);
+  context.renderer =
+      create_application_renderer(context.window, vsync);
   if (!context.renderer) {
     SDL_DestroyWindow(context.window);
     context.window = NULL;
@@ -245,11 +260,11 @@ void terminate_graphics_context(graphics_context_t* context) {
     SDL_DestroyRenderer(context->renderer);
     context->renderer = NULL;
   }
-  
+
   if (context->window) {
     SDL_DestroyWindow(context->window);
     context->window = NULL;
   }
-  
+
   SDL_Quit();
 }
