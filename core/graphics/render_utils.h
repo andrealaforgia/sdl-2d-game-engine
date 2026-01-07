@@ -15,7 +15,7 @@
 #include "geometry.h"
 #include "graphics_context.h"
 
-typedef graphics_context_t* graphics_context_ptr;
+// graphics_context_ptr typedef is provided by graphics_context.h
 
 /**
  * @brief Generate a random vibrant color from predefined palette

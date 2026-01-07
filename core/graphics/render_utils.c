@@ -3,11 +3,11 @@
  * @brief Implementation of rendering utility functions
  */
 
-#include "render_utils.h"
+#include "graphics.h"
 
 #include <stdlib.h>
 
-#include "graphics.h"
+#include "render_utils.h"
 #include "inline.h"
 
 ALWAYS_INLINE double wrap(double value, double upper_bound) {

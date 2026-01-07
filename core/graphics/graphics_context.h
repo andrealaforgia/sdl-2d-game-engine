@@ -23,6 +23,8 @@ typedef struct graphics_context {
   point_t screen_center;
 } graphics_context_t;
 
+typedef graphics_context_t* graphics_context_ptr;
+
 /**
  * @brief Initialize SDL subsystems and graphics hints
  * @return true if initialization successful, false otherwise
