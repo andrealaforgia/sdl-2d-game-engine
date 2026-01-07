@@ -72,14 +72,10 @@ void print_graphics_info(void) {
   SDL_Quit();
 }
 
-graphics_context_t init_graphics_context(int display, int display_mode,
-                                         window_mode_t window_mode,
-                                         bool vsync) {
-  graphics_context_t graphics_context = {0};
-
+static bool initialize_sdl_subsystems(void) {
   if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
     LOG_SDL_ERROR("SDL_Init");
-    abort();
+    return false;
   }
 
   // Initialize circle drawing lookup table for performance
@@ -126,6 +122,17 @@ graphics_context_t init_graphics_context(int display, int display_mode,
   }
 
   SDL_ShowCursor(SDL_DISABLE);
+  return true;
+}
+
+graphics_context_t init_graphics_context(int display, int display_mode,
+                                         window_mode_t window_mode,
+                                         bool vsync) {
+  graphics_context_t graphics_context = {0};
+
+  if (!initialize_sdl_subsystems()) {
+    abort();
+  }
 
   // Validate display index
   int num_displays = SDL_GetNumVideoDisplays();
