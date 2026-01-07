@@ -72,6 +72,62 @@ void print_graphics_info(void) {
   SDL_Quit();
 }
 
+static SDL_Renderer* create_game_renderer(SDL_Window* window, bool vsync) {
+  // Try hardware acceleration first, fall back to software if needed
+  Uint32 renderer_flags = SDL_RENDERER_ACCELERATED;
+  if (vsync) {
+    renderer_flags |= SDL_RENDERER_PRESENTVSYNC;
+  }
+
+  SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, renderer_flags);
+
+  if (!renderer) {
+    LOG_WARN("Hardware-accelerated renderer failed, trying software renderer");
+    LOG_SDL_ERROR("SDL_CreateRenderer (hardware)");
+
+    // Try software renderer as fallback
+    renderer_flags = SDL_RENDERER_SOFTWARE;
+    if (vsync) {
+      renderer_flags |= SDL_RENDERER_PRESENTVSYNC;
+    }
+
+    renderer = SDL_CreateRenderer(window, -1, renderer_flags);
+
+    if (!renderer) {
+      LOG_SDL_ERROR("SDL_CreateRenderer (software fallback)");
+      LOG_ERROR("Failed to create any renderer - aborting");
+      return NULL;
+    } else {
+      LOG_INFO("Using software renderer (performance may be reduced)");
+    }
+  }
+
+  // Log renderer info for debugging
+  SDL_RendererInfo renderer_info;
+  if (SDL_GetRendererInfo(renderer, &renderer_info) == 0) {
+    LOG_INFO_FMT("Renderer: %s", renderer_info.name);
+    
+    // Log renderer capabilities
+    if (renderer_info.flags & SDL_RENDERER_ACCELERATED) {
+      LOG_INFO("Renderer: Hardware-accelerated");
+    } else {
+      LOG_INFO("Renderer: Software");
+    }
+
+    if (renderer_info.flags & SDL_RENDERER_PRESENTVSYNC) {
+      LOG_INFO("Renderer: V-Sync enabled");
+    } else {
+      LOG_INFO("Renderer: V-Sync disabled");
+    }
+
+    if (renderer_info.flags & SDL_RENDERER_TARGETTEXTURE) {
+      LOG_INFO("Renderer: Target texture support");
+    }
+  }
+
+  return renderer;
+}
+
 static SDL_Window* create_game_window(const char* title, window_mode_t window_mode, 
                                      int display, int width, int height, 
                                      SDL_DisplayMode* display_mode) {
@@ -242,54 +298,9 @@ graphics_context_t init_graphics_context(int display, int display_mode,
   SDL_GL_GetDrawableSize(graphics_context.window, &drawable_w, &drawable_h);
   LOG_INFO_FMT("Drawable Size: w=%d h=%d", drawable_w, drawable_h);
 
-  // Try hardware acceleration first, fall back to software if needed
-  Uint32 renderer_flags = SDL_RENDERER_ACCELERATED;
-  if (vsync) {
-    renderer_flags |= SDL_RENDERER_PRESENTVSYNC;
-  }
-
-  graphics_context.renderer =
-      SDL_CreateRenderer(graphics_context.window, -1, renderer_flags);
-
+  graphics_context.renderer = create_game_renderer(graphics_context.window, vsync);
   if (!graphics_context.renderer) {
-    LOG_WARN("Hardware-accelerated renderer failed, trying software renderer");
-    LOG_SDL_ERROR("SDL_CreateRenderer (hardware)");
-
-    // Try software renderer as fallback
-    renderer_flags = SDL_RENDERER_SOFTWARE;
-    if (vsync) {
-      renderer_flags |= SDL_RENDERER_PRESENTVSYNC;
-    }
-
-    graphics_context.renderer =
-        SDL_CreateRenderer(graphics_context.window, -1, renderer_flags);
-
-    if (!graphics_context.renderer) {
-      LOG_SDL_ERROR("SDL_CreateRenderer (software fallback)");
-      LOG_ERROR("Failed to create any renderer - aborting");
-      abort();
-    } else {
-      LOG_INFO("Using software renderer (performance may be reduced)");
-    }
-  }
-
-  // Log renderer info for debugging
-  SDL_RendererInfo renderer_info;
-  if (SDL_GetRendererInfo(graphics_context.renderer, &renderer_info) == 0) {
-    LOG_INFO_FMT("Renderer: %s", renderer_info.name);
-
-    // Log renderer capabilities
-    if (renderer_info.flags & SDL_RENDERER_ACCELERATED) {
-      LOG_INFO("Renderer: Hardware-accelerated");
-    } else if (renderer_info.flags & SDL_RENDERER_SOFTWARE) {
-      LOG_INFO("Renderer: Software");
-    }
-
-    if (renderer_info.flags & SDL_RENDERER_PRESENTVSYNC) {
-      LOG_INFO("VSync: Enabled");
-    } else {
-      LOG_INFO("VSync: Disabled (using manual frame limiting)");
-    }
+    abort();
   }
 
   // Don't use logical size on macOS - causes scaling artifacts on Retina
