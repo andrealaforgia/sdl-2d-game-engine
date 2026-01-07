@@ -31,15 +31,17 @@ typedef enum {
 
 // Basic texture loading and management
 texture_t load_texture(SDL_Renderer* renderer, const char* filepath);
-texture_t load_texture_with_colorkey(SDL_Renderer* renderer, const char* filepath, 
+texture_t load_texture_with_colorkey(SDL_Renderer* renderer,
+                                     const char* filepath,
                                      int r, int g, int b);
 void free_texture(texture_ptr tex);
-void render_texture(SDL_Renderer* renderer, const texture_ptr tex, int x, int y);
+void render_texture(SDL_Renderer* renderer, const texture_ptr tex, int x,
+                    int y);
 
 // Advanced sprite rendering functions
-void render_sprite(const graphics_context_ptr graphics_context, 
-                   const texture_ptr tex, 
-                   const rect_t* src_rect, 
+void render_sprite(const graphics_context_ptr graphics_context,
+                   const texture_ptr tex,
+                   const rect_t* src_rect,
                    const rect_t* dst_rect);
 void render_sprite_scaled(const graphics_context_ptr graphics_context,
                           const texture_ptr tex,
@@ -58,6 +60,7 @@ void render_sprite_rotated(const graphics_context_ptr graphics_context,
 
 // Utility functions
 rect_t make_rect(int x, int y, int w, int h);
-void set_logical_size(const graphics_context_ptr graphics_context, int width, int height);
+void set_logical_size(const graphics_context_ptr graphics_context,
+                      int width, int height);
 
 #endif  // CORE_GRAPHICS_TEXTURE_H_
