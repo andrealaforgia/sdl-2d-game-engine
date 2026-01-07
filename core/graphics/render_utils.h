@@ -18,12 +18,6 @@
 // graphics_context_ptr typedef is provided by graphics_context.h
 
 /**
- * @brief Generate a random vibrant color from predefined palette
- * @return Random color value from bright color palette
- */
-color_t random_color(void);
-
-/**
  * @brief Generate a random point within graphics context bounds
  * @param graphics_context Graphics context containing screen dimensions
  * @return Random point within screen bounds

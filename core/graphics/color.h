@@ -31,4 +31,10 @@
 
 typedef int color_t;
 
+/**
+ * @brief Generate a random vibrant color from predefined palette
+ * @return Random color value from bright color palette
+ */
+color_t random_color(void);
+
 #endif  // CORE_GRAPHICS_COLOR_H_
