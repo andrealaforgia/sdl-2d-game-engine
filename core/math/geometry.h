@@ -30,5 +30,8 @@ vector_t points_vector(const point_ptr a, const point_ptr b);
 point_t relative_point(const point_ptr p, const rel_point_ptr rel_p);
 double point_distance(const point_ptr p1, const point_ptr p2);
 double random_angle(void);
+point_t random_point(int width, int height);
+point_t random_point_around(const point_ptr point, int min_tolerance,
+                            int max_tolerance);
 
 #endif  // CORE_MATH_GEOMETRY_H_

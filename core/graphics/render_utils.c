@@ -39,19 +39,9 @@ ALWAYS_INLINE color_t random_color(void) {
 }
 
 ALWAYS_INLINE point_t
-random_point(const graphics_context_ptr graphics_context) {
-  return point(rand() % graphics_context->screen_width,
-               rand() % graphics_context->screen_height);
-}
-
-ALWAYS_INLINE point_t random_point_around(const point_ptr p,
-                                          int min_tolerance,
-                                          int max_tolerance) {
-  int rndX = rand() % max_tolerance +
-             min_tolerance * (rand() % 10 < 5 ? 1 : -1);
-  int rndY = rand() % max_tolerance +
-             min_tolerance * (rand() % 10 < 5 ? 1 : -1);
-  return point(p->x + rndX, p->y + rndY);
+random_screen_point(const graphics_context_ptr graphics_context) {
+  return random_point(graphics_context->screen_width,
+                      graphics_context->screen_height);
 }
 
 ALWAYS_INLINE double wrap_x(const graphics_context_ptr graphics_context,

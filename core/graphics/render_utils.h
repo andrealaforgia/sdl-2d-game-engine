@@ -28,17 +28,7 @@ color_t random_color(void);
  * @param graphics_context Graphics context containing screen dimensions
  * @return Random point within screen bounds
  */
-point_t random_point(const graphics_context_ptr graphics_context);
-
-/**
- * @brief Generate a random point around a given point with tolerance
- * @param point Base point to generate around
- * @param min_tolerance Minimum distance from base point
- * @param max_tolerance Maximum distance from base point
- * @return Random point within tolerance range of base point
- */
-point_t random_point_around(const point_ptr point, int min_tolerance,
-                            int max_tolerance);
+point_t random_screen_point(const graphics_context_ptr graphics_context);
 
 /**
  * @brief Wrap X coordinate within screen bounds using toroidal wrapping
