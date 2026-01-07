@@ -17,9 +17,10 @@
 #include "geometry.h"
 #include "window_mode.h"
 #include "graphics_context.h"
-#include "drawing_primitives.h"
 
 typedef graphics_context_t* graphics_context_ptr;
+
+#include "drawing_primitives.h"
 
 void print_graphics_info(void);
 
