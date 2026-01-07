@@ -1,8 +1,10 @@
 #include "graphics.h"
+#include "graphics_context.h"
 
 #include <SDL.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "inline.h"
 #include "logger.h"
@@ -13,7 +15,7 @@ static double circle_cos[CIRCLE_POINTS];
 static double circle_sin[CIRCLE_POINTS];
 static bool circle_lookup_initialized = false;
 
-static void init_circle_lookup(void) {
+void init_circle_lookup(void) {
   if (!circle_lookup_initialized) {
     for (int i = 0; i < CIRCLE_POINTS; i++) {
       double angle = i * M_PI / 180.0;
@@ -72,250 +74,20 @@ void print_graphics_info(void) {
   SDL_Quit();
 }
 
-static SDL_Renderer* create_game_renderer(SDL_Window* window, bool vsync) {
-  // Try hardware acceleration first, fall back to software if needed
-  Uint32 renderer_flags = SDL_RENDERER_ACCELERATED;
-  if (vsync) {
-    renderer_flags |= SDL_RENDERER_PRESENTVSYNC;
-  }
-
-  SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, renderer_flags);
-
-  if (!renderer) {
-    LOG_WARN("Hardware-accelerated renderer failed, trying software renderer");
-    LOG_SDL_ERROR("SDL_CreateRenderer (hardware)");
-
-    // Try software renderer as fallback
-    renderer_flags = SDL_RENDERER_SOFTWARE;
-    if (vsync) {
-      renderer_flags |= SDL_RENDERER_PRESENTVSYNC;
-    }
-
-    renderer = SDL_CreateRenderer(window, -1, renderer_flags);
-
-    if (!renderer) {
-      LOG_SDL_ERROR("SDL_CreateRenderer (software fallback)");
-      LOG_ERROR("Failed to create any renderer - aborting");
-      return NULL;
-    } else {
-      LOG_INFO("Using software renderer (performance may be reduced)");
-    }
-  }
-
-  // Log renderer info for debugging
-  SDL_RendererInfo renderer_info;
-  if (SDL_GetRendererInfo(renderer, &renderer_info) == 0) {
-    LOG_INFO_FMT("Renderer: %s", renderer_info.name);
-    
-    // Log renderer capabilities
-    if (renderer_info.flags & SDL_RENDERER_ACCELERATED) {
-      LOG_INFO("Renderer: Hardware-accelerated");
-    } else {
-      LOG_INFO("Renderer: Software");
-    }
-
-    if (renderer_info.flags & SDL_RENDERER_PRESENTVSYNC) {
-      LOG_INFO("Renderer: V-Sync enabled");
-    } else {
-      LOG_INFO("Renderer: V-Sync disabled");
-    }
-
-    if (renderer_info.flags & SDL_RENDERER_TARGETTEXTURE) {
-      LOG_INFO("Renderer: Target texture support");
-    }
-  }
-
-  return renderer;
-}
-
-static SDL_Window* create_game_window(const char* title, window_mode_t window_mode, 
-                                     int display, int width, int height, 
-                                     SDL_DisplayMode* display_mode) {
-  Uint32 window_flags = SDL_WINDOW_ALLOW_HIGHDPI;
-
-  // Configure window flags based on mode
-  switch (window_mode) {
-    case WINDOWED:
-      window_flags |= SDL_WINDOW_RESIZABLE;
-      LOG_INFO("Window mode: Windowed");
-      break;
-    case FULLSCREEN:
-      window_flags |= SDL_WINDOW_FULLSCREEN;
-      LOG_INFO("Window mode: Fullscreen");
-      break;
-    case BORDERLESS:
-      window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_BORDERLESS;
-      LOG_INFO("Window mode: Borderless");
-      break;
-    case MAXIMIZED:
-      window_flags |= SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED;
-      LOG_INFO("Window mode: Maximized");
-      break;
-  }
-
-  SDL_Window* window = SDL_CreateWindow(
-      title, SDL_WINDOWPOS_CENTERED_DISPLAY(display),
-      SDL_WINDOWPOS_CENTERED_DISPLAY(display), width, height, window_flags);
-
-  if (!window) {
-    LOG_SDL_ERROR("SDL_CreateWindow");
-    return NULL;
-  }
-
-  // Set display mode for true fullscreen
-  if (window_mode == FULLSCREEN) {
-    if (SDL_SetWindowDisplayMode(window, display_mode) != 0) {
-      LOG_SDL_ERROR("SDL_SetWindowDisplayMode");
-      SDL_DestroyWindow(window);
-      return NULL;
-    }
-  }
-  
-  return window;
-}
-
-static bool validate_display_mode(int* display, int* display_mode, SDL_DisplayMode* sdl_display_mode) {
-  // Validate display index
-  int num_displays = SDL_GetNumVideoDisplays();
-  if (num_displays < 1) {
-    LOG_SDL_ERROR("SDL_GetNumVideoDisplays");
-    return false;
-  }
-
-  if (*display < 0 || *display >= num_displays) {
-    LOG_WARN_FMT("Invalid display index %d (valid range: 0-%d)", *display,
-                 num_displays - 1);
-    LOG_INFO("Falling back to display 0");
-    *display = 0;
-  }
-
-  // Validate display mode index
-  int num_modes = SDL_GetNumDisplayModes(*display);
-  if (num_modes < 1) {
-    LOG_SDL_ERROR("SDL_GetNumDisplayModes");
-    return false;
-  }
-
-  if (*display_mode < 0 || *display_mode >= num_modes) {
-    LOG_WARN_FMT("Invalid display mode %d for display %d (valid range: 0-%d)",
-                 *display_mode, *display, num_modes - 1);
-    LOG_INFO("Falling back to display mode 0");
-    *display_mode = 0;
-  }
-
-  if (SDL_GetDisplayMode(*display, *display_mode, sdl_display_mode) != 0) {
-    LOG_SDL_ERROR("SDL_GetDisplayMode");
-    return false;
-  }
-
-  LOG_INFO_FMT("Display Mode: w=%d h=%d refresh=%d", sdl_display_mode->w,
-               sdl_display_mode->h, sdl_display_mode->refresh_rate);
-  
-  return true;
-}
-
-static bool initialize_sdl_subsystems(void) {
-  if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
-    LOG_SDL_ERROR("SDL_Init");
-    return false;
-  }
-
-  // Initialize circle drawing lookup table for performance
-  init_circle_lookup();
-
-  // Set SDL hints for optimal performance
-  // These hints tune SDL's behavior for better rendering and responsiveness
-
-  // Use Metal renderer on macOS for best performance
-  if (!SDL_SetHint(SDL_HINT_RENDER_DRIVER, "metal")) {
-    LOG_WARN("Failed to set Metal renderer hint");
-  }
-
-  // Nearest pixel sampling (0) for crisp vector graphics, no smoothing
-  if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0")) {
-    LOG_WARN("Failed to set render scale quality hint");
-  }
-
-  // Enable render batching for better performance (batches draw calls)
-  if (!SDL_SetHint(SDL_HINT_RENDER_BATCHING, "1")) {
-    LOG_WARN("Failed to set render batching hint");
-  } else {
-    LOG_INFO("Render batching enabled");
-  }
-
-  // Enable framebuffer acceleration if available
-  if (!SDL_SetHint(SDL_HINT_FRAMEBUFFER_ACCELERATION, "1")) {
-    LOG_WARN("Failed to set framebuffer acceleration hint");
-  }
-
-  // Don't minimize window when losing focus (better for multi-monitor setups)
-  if (!SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0")) {
-    LOG_WARN("Failed to set minimize on focus loss hint");
-  }
-
-  // Enable mouse relative mode for better input performance
-  if (!SDL_SetHint(SDL_HINT_MOUSE_RELATIVE_MODE_WARP, "1")) {
-    LOG_WARN("Failed to set mouse relative mode hint");
-  }
-
-  // Use high-resolution mouse input
-  if (!SDL_SetHint(SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH, "1")) {
-    LOG_WARN("Failed to set mouse focus clickthrough hint");
-  }
-
-  SDL_ShowCursor(SDL_DISABLE);
-  return true;
-}
 
 graphics_context_t init_graphics_context(int display, int display_mode,
                                          window_mode_t window_mode,
                                          bool vsync) {
-  graphics_context_t graphics_context = {0};
-
-  if (!initialize_sdl_subsystems()) {
+  graphics_context_t context = initialize_graphics_context(display, display_mode, window_mode, vsync);
+  
+  if (!context.window || !context.renderer) {
+    LOG_ERROR("Failed to initialize graphics context");
     abort();
   }
-
-  SDL_DisplayMode sdl_display_mode;
-  if (!validate_display_mode(&display, &display_mode, &sdl_display_mode)) {
-    abort();
-  }
-
-  graphics_context.screen_width = sdl_display_mode.w;
-  graphics_context.screen_height = sdl_display_mode.h;
-  graphics_context.screen_center = point(graphics_context.screen_width / 2,
-                                         graphics_context.screen_height / 2);
-
-  graphics_context.window = create_game_window("Asteroids", window_mode, display, 
-                                               graphics_context.screen_width, 
-                                               graphics_context.screen_height, 
-                                               &sdl_display_mode);
-  if (!graphics_context.window) {
-    abort();
-  }
-
-  int drawable_w, drawable_h;
-  SDL_GL_GetDrawableSize(graphics_context.window, &drawable_w, &drawable_h);
-  LOG_INFO_FMT("Drawable Size: w=%d h=%d", drawable_w, drawable_h);
-
-  graphics_context.renderer = create_game_renderer(graphics_context.window, vsync);
-  if (!graphics_context.renderer) {
-    abort();
-  }
-
-  // Don't use logical size on macOS - causes scaling artifacts on Retina
-  // displays SDL_RenderSetLogicalSize(graphics_context.renderer,
-  //                          graphics_context.screen_width,
-  //                          graphics_context.screen_height);
-
-  return graphics_context;
+  
+  return context;
 }
 
-void terminate_graphics_context(const graphics_context_ptr graphics_context) {
-  SDL_DestroyRenderer(graphics_context->renderer);
-  SDL_DestroyWindow(graphics_context->window);
-  SDL_Quit();
-}
 
 void toggle_fullscreen(const graphics_context_ptr graphics_context) {
   // Get current fullscreen state

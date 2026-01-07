@@ -16,20 +16,14 @@
 #include "color.h"
 #include "geometry.h"
 #include "window_mode.h"
+#include "graphics_context.h"
 
-typedef struct {
-  SDL_Window* window;
-  SDL_Renderer* renderer;
-  int screen_width;
-  int screen_height;
-  point_t screen_center;
-} graphics_context_t, *graphics_context_ptr;
+typedef graphics_context_t* graphics_context_ptr;
 
 void print_graphics_info(void);
 
 graphics_context_t init_graphics_context(int display, int display_mode,
                                          window_mode_t window_mode, bool vsync);
-void terminate_graphics_context(const graphics_context_ptr graphics_context);
 void toggle_fullscreen(const graphics_context_ptr graphics_context);
 void draw_line_between_points(const graphics_context_ptr graphics_context,
                               const point_ptr p1, const point_ptr p2,
@@ -57,5 +51,6 @@ bool out_of_bounds(const graphics_context_ptr graphics_context,
                    const point_ptr point);
 point_t random_point_around(const point_ptr point, int min_tolerance,
                             int max_tolerance);
+void init_circle_lookup(void);
 
 #endif  // CORE_GRAPHICS_GRAPHICS_H_
