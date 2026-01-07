@@ -72,6 +72,46 @@ void print_graphics_info(void) {
   SDL_Quit();
 }
 
+static bool validate_display_mode(int* display, int* display_mode, SDL_DisplayMode* sdl_display_mode) {
+  // Validate display index
+  int num_displays = SDL_GetNumVideoDisplays();
+  if (num_displays < 1) {
+    LOG_SDL_ERROR("SDL_GetNumVideoDisplays");
+    return false;
+  }
+
+  if (*display < 0 || *display >= num_displays) {
+    LOG_WARN_FMT("Invalid display index %d (valid range: 0-%d)", *display,
+                 num_displays - 1);
+    LOG_INFO("Falling back to display 0");
+    *display = 0;
+  }
+
+  // Validate display mode index
+  int num_modes = SDL_GetNumDisplayModes(*display);
+  if (num_modes < 1) {
+    LOG_SDL_ERROR("SDL_GetNumDisplayModes");
+    return false;
+  }
+
+  if (*display_mode < 0 || *display_mode >= num_modes) {
+    LOG_WARN_FMT("Invalid display mode %d for display %d (valid range: 0-%d)",
+                 *display_mode, *display, num_modes - 1);
+    LOG_INFO("Falling back to display mode 0");
+    *display_mode = 0;
+  }
+
+  if (SDL_GetDisplayMode(*display, *display_mode, sdl_display_mode) != 0) {
+    LOG_SDL_ERROR("SDL_GetDisplayMode");
+    return false;
+  }
+
+  LOG_INFO_FMT("Display Mode: w=%d h=%d refresh=%d", sdl_display_mode->w,
+               sdl_display_mode->h, sdl_display_mode->refresh_rate);
+  
+  return true;
+}
+
 static bool initialize_sdl_subsystems(void) {
   if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
     LOG_SDL_ERROR("SDL_Init");
@@ -134,42 +174,10 @@ graphics_context_t init_graphics_context(int display, int display_mode,
     abort();
   }
 
-  // Validate display index
-  int num_displays = SDL_GetNumVideoDisplays();
-  if (num_displays < 1) {
-    LOG_SDL_ERROR("SDL_GetNumVideoDisplays");
-    abort();
-  }
-
-  if (display < 0 || display >= num_displays) {
-    LOG_WARN_FMT("Invalid display index %d (valid range: 0-%d)", display,
-                 num_displays - 1);
-    LOG_INFO("Falling back to display 0");
-    display = 0;
-  }
-
-  // Validate display mode index
-  int num_modes = SDL_GetNumDisplayModes(display);
-  if (num_modes < 1) {
-    LOG_SDL_ERROR("SDL_GetNumDisplayModes");
-    abort();
-  }
-
-  if (display_mode < 0 || display_mode >= num_modes) {
-    LOG_WARN_FMT("Invalid display mode %d for display %d (valid range: 0-%d)",
-                 display_mode, display, num_modes - 1);
-    LOG_INFO("Falling back to display mode 0");
-    display_mode = 0;
-  }
-
   SDL_DisplayMode sdl_display_mode;
-  if (SDL_GetDisplayMode(display, display_mode, &sdl_display_mode) != 0) {
-    LOG_SDL_ERROR("SDL_GetDisplayMode");
+  if (!validate_display_mode(&display, &display_mode, &sdl_display_mode)) {
     abort();
   }
-
-  LOG_INFO_FMT("Display Mode: w=%d h=%d refresh=%d", sdl_display_mode.w,
-               sdl_display_mode.h, sdl_display_mode.refresh_rate);
 
   graphics_context.screen_width = sdl_display_mode.w;
   graphics_context.screen_height = sdl_display_mode.h;
