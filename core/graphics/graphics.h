@@ -21,12 +21,10 @@
 typedef graphics_context_t* graphics_context_ptr;
 
 #include "drawing_primitives.h"
-
-void print_graphics_info(void);
+#include "display_manager.h"
 
 graphics_context_t init_graphics_context(int display, int display_mode,
                                          window_mode_t window_mode, bool vsync);
-void toggle_fullscreen(const graphics_context_ptr graphics_context);
 double wrap_x(const graphics_context_ptr graphics_context, double x);
 double wrap_y(const graphics_context_ptr graphics_context, double y);
 point_t random_point(const graphics_context_ptr graphics_context);
