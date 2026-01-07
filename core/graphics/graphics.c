@@ -72,6 +72,52 @@ void print_graphics_info(void) {
   SDL_Quit();
 }
 
+static SDL_Window* create_game_window(const char* title, window_mode_t window_mode, 
+                                     int display, int width, int height, 
+                                     SDL_DisplayMode* display_mode) {
+  Uint32 window_flags = SDL_WINDOW_ALLOW_HIGHDPI;
+
+  // Configure window flags based on mode
+  switch (window_mode) {
+    case WINDOWED:
+      window_flags |= SDL_WINDOW_RESIZABLE;
+      LOG_INFO("Window mode: Windowed");
+      break;
+    case FULLSCREEN:
+      window_flags |= SDL_WINDOW_FULLSCREEN;
+      LOG_INFO("Window mode: Fullscreen");
+      break;
+    case BORDERLESS:
+      window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_BORDERLESS;
+      LOG_INFO("Window mode: Borderless");
+      break;
+    case MAXIMIZED:
+      window_flags |= SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED;
+      LOG_INFO("Window mode: Maximized");
+      break;
+  }
+
+  SDL_Window* window = SDL_CreateWindow(
+      title, SDL_WINDOWPOS_CENTERED_DISPLAY(display),
+      SDL_WINDOWPOS_CENTERED_DISPLAY(display), width, height, window_flags);
+
+  if (!window) {
+    LOG_SDL_ERROR("SDL_CreateWindow");
+    return NULL;
+  }
+
+  // Set display mode for true fullscreen
+  if (window_mode == FULLSCREEN) {
+    if (SDL_SetWindowDisplayMode(window, display_mode) != 0) {
+      LOG_SDL_ERROR("SDL_SetWindowDisplayMode");
+      SDL_DestroyWindow(window);
+      return NULL;
+    }
+  }
+  
+  return window;
+}
+
 static bool validate_display_mode(int* display, int* display_mode, SDL_DisplayMode* sdl_display_mode) {
   // Validate display index
   int num_displays = SDL_GetNumVideoDisplays();
@@ -184,45 +230,12 @@ graphics_context_t init_graphics_context(int display, int display_mode,
   graphics_context.screen_center = point(graphics_context.screen_width / 2,
                                          graphics_context.screen_height / 2);
 
-  Uint32 window_flags = SDL_WINDOW_ALLOW_HIGHDPI;
-
-  // Configure window flags based on mode
-  switch (window_mode) {
-    case WINDOWED:
-      window_flags |= SDL_WINDOW_RESIZABLE;
-      LOG_INFO("Window mode: Windowed");
-      break;
-    case FULLSCREEN:
-      window_flags |= SDL_WINDOW_FULLSCREEN;
-      LOG_INFO("Window mode: Fullscreen");
-      break;
-    case BORDERLESS:
-      window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_BORDERLESS;
-      LOG_INFO("Window mode: Borderless");
-      break;
-    case MAXIMIZED:
-      window_flags |= SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED;
-      LOG_INFO("Window mode: Maximized");
-      break;
-  }
-
-  graphics_context.window = SDL_CreateWindow(
-      "Asteroids", SDL_WINDOWPOS_CENTERED_DISPLAY(display),
-      SDL_WINDOWPOS_CENTERED_DISPLAY(display), graphics_context.screen_width,
-      graphics_context.screen_height, window_flags);
-
+  graphics_context.window = create_game_window("Asteroids", window_mode, display, 
+                                               graphics_context.screen_width, 
+                                               graphics_context.screen_height, 
+                                               &sdl_display_mode);
   if (!graphics_context.window) {
-    LOG_SDL_ERROR("SDL_CreateWindow");
     abort();
-  }
-
-  // Set display mode for true fullscreen
-  if (window_mode == FULLSCREEN) {
-    if (SDL_SetWindowDisplayMode(graphics_context.window, &sdl_display_mode) !=
-        0) {
-      LOG_SDL_ERROR("SDL_SetWindowDisplayMode");
-      abort();
-    }
   }
 
   int drawable_w, drawable_h;
