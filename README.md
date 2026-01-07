@@ -7,7 +7,12 @@ A lightweight, modular 2D game engine built with C and SDL2, designed for creati
 ### Graphics
 - **Texture loading and rendering** (PNG, JPG support via SDL2_image)
 - **Primitive rendering** (lines, circles, polygons, pixels)
-- **Scrolling background system** for platformers
+- **Graphics context management** with modular design
+- **Display management** with multiple monitor support
+- **Drawing primitives module** with optimized rendering
+- **TTF text rendering** with font management
+- **Bitmap font support** for pixel-perfect text
+- **Color utilities** with predefined color palettes
 - **Frame rate management** and VSync support
 - **FPS tracking and display**
 - **Multiple window modes** (windowed, fullscreen, borderless)
@@ -40,18 +45,30 @@ A lightweight, modular 2D game engine built with C and SDL2, designed for creati
 ```
 core/
 ├── graphics/       # Rendering, textures, display
-│   ├── graphics.{c,h}
-│   ├── texture.{c,h}
-│   ├── frame.{c,h}
-│   ├── fps_tracker.{c,h}
-│   └── ...
+│   ├── graphics.{c,h}              # Main graphics initialization
+│   ├── graphics_context.{c,h}      # Graphics context management
+│   ├── display_manager.{c,h}       # Multi-display support
+│   ├── drawing_primitives.{c,h}    # Optimized primitive rendering
+│   ├── texture.{c,h}               # Texture loading and rendering
+│   ├── text.{c,h}                  # Text rendering utilities
+│   ├── ttf_text.{c,h}              # TTF font rendering
+│   ├── bitmap_font.{c,h}           # Bitmap font support
+│   ├── color.{c,h}                 # Color utilities
+│   ├── frame.{c,h}                 # Frame management
+│   ├── fps_tracker.{c,h}           # FPS tracking
+│   ├── frame_limiter.{c,h}         # Frame rate limiting
+│   ├── render_utils.{c,h}          # Rendering utilities
+│   ├── coords.h                    # Coordinate definitions
+│   ├── window_mode.h               # Window mode enums
+│   └── fonts/                      # Font assets
 ├── input/          # Keyboard, events
 │   ├── keyboard.{c,h}
 │   └── events.{c,h}
 ├── math/           # Physics, geometry
-│   ├── geometry.{c,h}
-│   ├── physics.{c,h}
-│   └── animate.{c,h}
+│   ├── geometry.{c,h}              # Point, vector operations
+│   ├── physics.{c,h}               # Physics simulation
+│   ├── animate.{c,h}               # Animation utilities
+│   └── collision.{c,h}             # Collision detection
 ├── audio/          # Sound system
 │   └── audio.{c,h}
 ├── time/           # Timing utilities
@@ -61,9 +78,10 @@ core/
 ├── events/         # Event system
 │   └── event_system.{c,h}
 └── utils/          # Common utilities
-    ├── logger.h
-    ├── types.h
-    └── command_line.{c,h}
+    ├── logger.h                    # Logging macros
+    ├── types.h                     # Common type definitions
+    ├── inline.h                    # Inline function macros
+    └── command_line.{c,h}          # CLI argument parsing
 ```
 
 ## Requirements
@@ -72,6 +90,11 @@ core/
 - **SDL2** - Core graphics and window management
 - **SDL2_image** - Image loading (PNG, JPG)
 - **SDL2_mixer** - Audio playback
+- **SDL2_ttf** - TTF font rendering
+
+### Development Dependencies
+- **cpplint** - Code style checking
+- **clang-format** - Code formatting
 
 ### Platforms
 - macOS (tested)
@@ -82,13 +105,30 @@ core/
 
 ### macOS
 ```bash
-brew install sdl2 sdl2_image sdl2_mixer
+brew install sdl2 sdl2_image sdl2_mixer sdl2_ttf
+
+# Development tools (optional)
+brew install cpplint clang-format
 ```
 
 ### Linux (Ubuntu/Debian)
 ```bash
 sudo apt-get update
-sudo apt-get install -y libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev
+sudo apt-get install -y libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev
+
+# Development tools (optional)
+sudo apt-get install -y cpplint clang-format
+```
+
+### Quick Install
+The engine provides automated installation commands:
+
+```bash
+# Install runtime dependencies
+make install
+
+# Install development dependencies
+make dev_install
 ```
 
 ## Usage
@@ -118,7 +158,7 @@ Add the engine directories to your Makefile:
 ```makefile
 CC = gcc
 SDL2_CFLAGS := $(shell sdl2-config --cflags)
-SDL2_LFLAGS := $(shell sdl2-config --libs) -lSDL2_image -lSDL2_mixer
+SDL2_LFLAGS := $(shell sdl2-config --libs) -lSDL2_image -lSDL2_mixer -lSDL2_ttf
 
 ENGINE_GRAPHICS_DIR = engine/core/graphics
 ENGINE_MATH_DIR = engine/core/math
@@ -227,16 +267,21 @@ This engine is suitable for:
 
 ```c
 // Initialize graphics context
-graphics_context_t ctx = init_graphics_context(display, mode, window_mode, vsync);
+graphics_context_ptr ctx = initialize_graphics_context(width, height, window_mode, vsync);
 
 // Load and render textures
-texture_t bg = load_texture(renderer, "background.png");
-render_texture(renderer, &bg, x, y);
+texture_t bg = load_texture(ctx->renderer, "background.png");
+render_texture(ctx->renderer, &bg, x, y);
 
-// Draw primitives
+// Draw primitives (requires init_circle_lookup() first)
+init_circle_lookup();
 draw_line(ctx, x1, y1, x2, y2, color);
 draw_circle(ctx, cx, cy, radius, color);
 draw_filled_polygon(ctx, points, num_points, color);
+
+// Text rendering
+render_ttf_text(ctx, font, text, x, y, color);
+render_bitmap_text(ctx, font, text, x, y, color);
 ```
 
 ### Player/Physics
@@ -276,9 +321,39 @@ int jump_sound = load_sound(&audio, "jump.wav");
 play_sound(&audio, jump_sound);
 ```
 
+## Development
+
+### Code Quality
+The project maintains high code quality standards:
+
+```bash
+# Check code style
+make lint
+
+# Auto-format code
+make format
+
+# Build library
+make all
+
+# Clean build artifacts
+make clean
+```
+
+### Code Standards
+- **C99 standard** with strict compiler warnings
+- **Google C++ style guide** (adapted for C)
+- **Header include order**: Own header, system headers, local headers
+- **Line length**: Maximum 80 characters
+- **Header guards**: `CORE_MODULE_FILENAME_H_` format
+
 ## Contributing
 
-Contributions are welcome! Please feel free to submit pull requests or open issues.
+Contributions are welcome! Please:
+1. Follow the existing code style (use `make lint` and `make format`)
+2. Include tests for new features
+3. Update documentation as needed
+4. Submit pull requests against the `main` branch
 
 ## License
 
