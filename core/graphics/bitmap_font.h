@@ -75,6 +75,25 @@ void render_bitmap_text(const bitmap_font_ptr font,
                          font_color_t color);
 
 /**
+ * Render scaled text at the specified position using the bitmap font
+ *
+ * @param font Bitmap font to use
+ * @param graphics_context Graphics context for rendering
+ * @param text Text string to render (supports A-Z, 0-9, !, /, -, space)
+ * @param x X position to render at
+ * @param y Y position to render at
+ * @param color Font color to use
+ * @param scale Scale factor (1 = normal size, 2 = double size, etc.)
+ */
+void render_bitmap_text_scaled(const bitmap_font_ptr font,
+                               const graphics_context_ptr graphics_context,
+                               const char* text,
+                               int x,
+                               int y,
+                               font_color_t color,
+                               int scale);
+
+/**
  * Get the width in pixels of the rendered text
  *
  * @param font Bitmap font to measure with
@@ -82,6 +101,17 @@ void render_bitmap_text(const bitmap_font_ptr font,
  * @return Width in pixels
  */
 int get_bitmap_text_width(const bitmap_font_ptr font, const char* text);
+
+/**
+ * Get the width in pixels of the rendered scaled text
+ *
+ * @param font Bitmap font to measure with
+ * @param text Text string to measure
+ * @param scale Scale factor
+ * @return Width in pixels
+ */
+int get_bitmap_text_width_scaled(const bitmap_font_ptr font,
+                                  const char* text, int scale);
 
 /**
  * Free bitmap font resources
