@@ -46,9 +46,18 @@ LFLAGS := $(SDL2_LFLAGS) -lm
 # Library target for the engine
 LIB_TARGET = libsdl2d.a
 
-.PHONY: all install dev_install clean lint format
+# Test applications
+ARCADE_FONT_TEST = arcade_font_test
+ARCADE_FONT_TEST_SRC = arcade_font_test.c
+
+.PHONY: all install dev_install clean lint format arcade_font_test
 
 all: $(LIB_TARGET)
+
+arcade_font_test: $(ARCADE_FONT_TEST)
+
+$(ARCADE_FONT_TEST): $(ARCADE_FONT_TEST_SRC) $(LIB_TARGET)
+	$(CC) $(CFLAGS) -o $@ $< $(LIB_TARGET) $(LFLAGS)
 
 $(LIB_TARGET): $(OBJ)
 	$(AR) rcs $@ $^
@@ -68,7 +77,7 @@ lint:
 	cpplint --filter=-build/include_subdir,-legal/copyright,-runtime/threadsafe_fn,-readability/casting $(SRC) $(HEADERS)
 
 clean:
-	rm -f $(OBJ) $(LIB_TARGET)
+	rm -f $(OBJ) $(LIB_TARGET) $(ARCADE_FONT_TEST)
 
 format:
 	clang-format -i -style=Google $(SRC) $(HEADERS)
