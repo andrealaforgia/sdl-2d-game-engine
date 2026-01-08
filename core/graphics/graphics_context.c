@@ -9,8 +9,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "graphics.h"
 #include "geometry.h"
+#include "graphics.h"
 
 // Logging macros - simplified for context module
 #define LOG_INFO(msg) printf("INFO: %s\n", msg)
@@ -89,9 +89,8 @@ bool validate_display_configuration(int* display, int* display_mode,
   }
 
   if (*display_mode < 0 || *display_mode >= num_modes) {
-    LOG_WARN_FMT(
-        "Invalid display mode %d for display %d (valid range: 0-%d)",
-        *display_mode, *display, num_modes - 1);
+    LOG_WARN_FMT("Invalid display mode %d for display %d (valid range: 0-%d)",
+                 *display_mode, *display, num_modes - 1);
     LOG_INFO("Falling back to display mode 0");
     *display_mode = 0;
   }
@@ -107,8 +106,8 @@ bool validate_display_configuration(int* display, int* display_mode,
 }
 
 SDL_Window* create_application_window(const char* title,
-                                      window_mode_t window_mode,
-                                      int display, int width, int height,
+                                      window_mode_t window_mode, int display,
+                                      int width, int height,
                                       SDL_DisplayMode* display_mode) {
   Uint32 window_flags = SDL_WINDOW_ALLOW_HIGHDPI;
 
@@ -123,8 +122,7 @@ SDL_Window* create_application_window(const char* title,
       LOG_INFO("Window mode: Fullscreen");
       break;
     case BORDERLESS:
-      window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP |
-                      SDL_WINDOW_BORDERLESS;
+      window_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_BORDERLESS;
       LOG_INFO("Window mode: Borderless");
       break;
     case MAXIMIZED:
@@ -133,10 +131,9 @@ SDL_Window* create_application_window(const char* title,
       break;
   }
 
-  SDL_Window* window =
-      SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED_DISPLAY(display),
-                       SDL_WINDOWPOS_CENTERED_DISPLAY(display), width,
-                       height, window_flags);
+  SDL_Window* window = SDL_CreateWindow(
+      title, SDL_WINDOWPOS_CENTERED_DISPLAY(display),
+      SDL_WINDOWPOS_CENTERED_DISPLAY(display), width, height, window_flags);
 
   if (!window) {
     LOG_SDL_ERROR("SDL_CreateWindow");
@@ -165,8 +162,7 @@ SDL_Renderer* create_application_renderer(SDL_Window* window, bool vsync) {
   SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, renderer_flags);
 
   if (!renderer) {
-    LOG_WARN(
-        "Hardware-accelerated renderer failed, trying software renderer");
+    LOG_WARN("Hardware-accelerated renderer failed, trying software renderer");
     LOG_SDL_ERROR("SDL_CreateRenderer (hardware)");
 
     // Try software renderer as fallback
@@ -182,8 +178,7 @@ SDL_Renderer* create_application_renderer(SDL_Window* window, bool vsync) {
       LOG_ERROR("Failed to create any renderer - aborting");
       return NULL;
     } else {
-      LOG_INFO(
-          "Using software renderer (performance may be reduced)");
+      LOG_INFO("Using software renderer (performance may be reduced)");
     }
   }
 
@@ -211,8 +206,7 @@ SDL_Renderer* create_application_renderer(SDL_Window* window, bool vsync) {
   return renderer;
 }
 
-graphics_context_t initialize_graphics_context(int display,
-                                               int display_mode,
+graphics_context_t initialize_graphics_context(int display, int display_mode,
                                                window_mode_t window_mode,
                                                bool vsync) {
   graphics_context_t context = {0};
@@ -229,19 +223,17 @@ graphics_context_t initialize_graphics_context(int display,
 
   context.screen_width = sdl_display_mode.w;
   context.screen_height = sdl_display_mode.h;
-  context.screen_center = point(context.screen_width / 2,
-                                context.screen_height / 2);
+  context.screen_center =
+      point(context.screen_width / 2, context.screen_height / 2);
 
-  context.window =
-      create_application_window("Asteroids", window_mode, display,
-                                context.screen_width, context.screen_height,
-                                &sdl_display_mode);
+  context.window = create_application_window(
+      "Asteroids", window_mode, display, context.screen_width,
+      context.screen_height, &sdl_display_mode);
   if (!context.window) {
     return context;
   }
 
-  context.renderer =
-      create_application_renderer(context.window, vsync);
+  context.renderer = create_application_renderer(context.window, vsync);
   if (!context.renderer) {
     SDL_DestroyWindow(context.window);
     context.window = NULL;

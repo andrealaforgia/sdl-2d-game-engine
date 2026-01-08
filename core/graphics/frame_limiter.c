@@ -1,8 +1,7 @@
 #include "frame_limiter.h"
 
-#include <stdbool.h>
-
 #include <SDL.h>
+#include <stdbool.h>
 
 frame_limiter_t create_frame_limiter(int target_fps) {
   frame_limiter_t limiter;

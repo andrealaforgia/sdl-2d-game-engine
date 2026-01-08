@@ -3,7 +3,8 @@
  * @brief Drawing primitive functions for lines, pixels, circles, and polygons
  *
  * Contains all basic drawing operations that use the graphics context to render
- * geometric primitives to the screen. Separated from graphics.c for better modularity.
+ * geometric primitives to the screen. Separated from graphics.c for better
+ * modularity.
  */
 
 #ifndef CORE_GRAPHICS_DRAWING_PRIMITIVES_H_
@@ -20,7 +21,7 @@
  * @brief Draw a line between two coordinate points
  * @param graphics_context Graphics context containing renderer
  * @param x1 Starting x coordinate
- * @param y1 Starting y coordinate  
+ * @param y1 Starting y coordinate
  * @param x2 Ending x coordinate
  * @param y2 Ending y coordinate
  * @param color Line color
@@ -67,8 +68,8 @@ void draw_pixel(const graphics_context_ptr graphics_context, int x, int y,
  * @param p Point location
  * @param color Pixel color
  */
-void draw_point(const graphics_context_ptr graphics_context,
-                const point_ptr p, color_t color);
+void draw_point(const graphics_context_ptr graphics_context, const point_ptr p,
+                color_t color);
 
 /**
  * @brief Draw a fat pixel (5x5 square) for enhanced visibility
@@ -87,9 +88,8 @@ void draw_fat_pixel(const graphics_context_ptr graphics_context,
  * @param radius Circle radius
  * @param color Circle color
  */
-void draw_circle(const graphics_context_ptr graphics_context,
-                 int32_t centreX, int32_t centreY, int32_t radius,
-                 color_t color);
+void draw_circle(const graphics_context_ptr graphics_context, int32_t centreX,
+                 int32_t centreY, int32_t radius, color_t color);
 
 /**
  * @brief Draw a filled polygon using triangle fan approach
@@ -104,7 +104,7 @@ void draw_filled_polygon(const graphics_context_ptr graphics_context,
 
 /**
  * @brief Initialize circle drawing lookup tables for performance
- * 
+ *
  * Must be called before using draw_circle() function. Creates pre-calculated
  * sin/cos lookup table for smooth circle rendering.
  */

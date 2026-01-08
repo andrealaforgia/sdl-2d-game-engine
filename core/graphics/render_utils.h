@@ -1,6 +1,7 @@
 /**
  * @file render_utils.h
- * @brief Rendering utility functions for colors, coordinates, and bounds checking
+ * @brief Rendering utility functions for colors, coordinates, and bounds
+ * checking
  *
  * Contains utility functions for color generation, coordinate wrapping,
  * random point generation, and bounds validation. These utilities support
@@ -11,6 +12,7 @@
 #define CORE_GRAPHICS_RENDER_UTILS_H_
 
 #include <stdbool.h>
+
 #include "color.h"
 #include "geometry.h"
 #include "graphics_context.h"

@@ -62,8 +62,8 @@ void render_texture(SDL_Renderer* renderer, const texture_ptr tex, int x,
 }
 
 texture_t load_texture_with_colorkey(SDL_Renderer* renderer,
-                                     const char* filepath,
-                                     int r, int g, int b) {
+                                     const char* filepath, int r, int g,
+                                     int b) {
   texture_t tex = {NULL, 0, 0};
 
   SDL_Surface* surface = IMG_Load(filepath);
@@ -89,15 +89,14 @@ texture_t load_texture_with_colorkey(SDL_Renderer* renderer,
 
   SDL_FreeSurface(surface);
 
-  LOG_INFO_FMT("Loaded texture with colorkey: %s (%dx%d)", filepath,
-               tex.width, tex.height);
+  LOG_INFO_FMT("Loaded texture with colorkey: %s (%dx%d)", filepath, tex.width,
+               tex.height);
 
   return tex;
 }
 
 void render_sprite(const graphics_context_ptr graphics_context,
-                   const texture_ptr tex,
-                   const rect_t* src_rect,
+                   const texture_ptr tex, const rect_t* src_rect,
                    const rect_t* dst_rect) {
   if (!graphics_context || !tex || !tex->texture) {
     return;
@@ -124,9 +123,8 @@ void render_sprite(const graphics_context_ptr graphics_context,
 }
 
 void render_sprite_scaled(const graphics_context_ptr graphics_context,
-                          const texture_ptr tex,
-                          const rect_t* src_rect,
-                          int x, int y, int scale) {
+                          const texture_ptr tex, const rect_t* src_rect, int x,
+                          int y, int scale) {
   if (!graphics_context || !tex || !tex->texture || scale <= 0) {
     return;
   }
@@ -139,20 +137,14 @@ void render_sprite_scaled(const graphics_context_ptr graphics_context,
     src.h = src_rect->h;
   }
 
-  SDL_Rect dst = {
-    x, y,
-    src.w * scale,
-    src.h * scale
-  };
+  SDL_Rect dst = {x, y, src.w * scale, src.h * scale};
 
   SDL_RenderCopy(graphics_context->renderer, tex->texture, &src, &dst);
 }
 
 void render_sprite_flipped(const graphics_context_ptr graphics_context,
-                           const texture_ptr tex,
-                           const rect_t* src_rect,
-                           const rect_t* dst_rect,
-                           flip_t flip) {
+                           const texture_ptr tex, const rect_t* src_rect,
+                           const rect_t* dst_rect, flip_t flip) {
   if (!graphics_context || !tex || !tex->texture) {
     return;
   }
@@ -182,15 +174,13 @@ void render_sprite_flipped(const graphics_context_ptr graphics_context,
     sdl_flip |= SDL_FLIP_VERTICAL;
   }
 
-  SDL_RenderCopyEx(graphics_context->renderer, tex->texture, &src, &dst,
-                   0.0, NULL, sdl_flip);
+  SDL_RenderCopyEx(graphics_context->renderer, tex->texture, &src, &dst, 0.0,
+                   NULL, sdl_flip);
 }
 
 void render_sprite_rotated(const graphics_context_ptr graphics_context,
-                           const texture_ptr tex,
-                           const rect_t* src_rect,
-                           const rect_t* dst_rect,
-                           double angle, flip_t flip) {
+                           const texture_ptr tex, const rect_t* src_rect,
+                           const rect_t* dst_rect, double angle, flip_t flip) {
   if (!graphics_context || !tex || !tex->texture) {
     return;
   }
@@ -220,8 +210,8 @@ void render_sprite_rotated(const graphics_context_ptr graphics_context,
     sdl_flip |= SDL_FLIP_VERTICAL;
   }
 
-  SDL_RenderCopyEx(graphics_context->renderer, tex->texture, &src, &dst,
-                   angle, NULL, sdl_flip);
+  SDL_RenderCopyEx(graphics_context->renderer, tex->texture, &src, &dst, angle,
+                   NULL, sdl_flip);
 }
 
 rect_t make_rect(int x, int y, int w, int h) {
@@ -229,8 +219,8 @@ rect_t make_rect(int x, int y, int w, int h) {
   return rect;
 }
 
-void set_logical_size(const graphics_context_ptr graphics_context,
-                      int width, int height) {
+void set_logical_size(const graphics_context_ptr graphics_context, int width,
+                      int height) {
   if (!graphics_context) {
     return;
   }

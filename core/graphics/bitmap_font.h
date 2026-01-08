@@ -12,8 +12,8 @@
 #include <SDL.h>
 #include <stdbool.h>
 
-#include "graphics_context.h"
 #include "graphics.h"
+#include "graphics_context.h"
 #include "texture.h"
 
 /**
@@ -34,9 +34,9 @@ typedef enum {
  */
 typedef struct {
   texture_t texture;
-  int char_width;   // Width of each character in pixels
-  int char_height;  // Height of each character in pixels
-  int row_spacing;  // Vertical spacing between character rows
+  int char_width;    // Width of each character in pixels
+  int char_height;   // Height of each character in pixels
+  int row_spacing;   // Vertical spacing between character rows
   int color_offset;  // Vertical offset between color variations
 } bitmap_font_t, *bitmap_font_ptr;
 
@@ -52,11 +52,9 @@ typedef struct {
  * @return Initialized bitmap font structure
  */
 bitmap_font_t load_bitmap_font(const graphics_context_ptr graphics_context,
-                                const char* sprite_sheet_path,
-                                int char_width,
-                                int char_height,
-                                int row_spacing,
-                                int color_offset);
+                               const char* sprite_sheet_path, int char_width,
+                               int char_height, int row_spacing,
+                               int color_offset);
 
 /**
  * Render text at the specified position using the bitmap font
@@ -69,11 +67,8 @@ bitmap_font_t load_bitmap_font(const graphics_context_ptr graphics_context,
  * @param color Font color to use
  */
 void render_bitmap_text(const bitmap_font_ptr font,
-                         const graphics_context_ptr graphics_context,
-                         const char* text,
-                         int x,
-                         int y,
-                         font_color_t color);
+                        const graphics_context_ptr graphics_context,
+                        const char* text, int x, int y, font_color_t color);
 
 /**
  * Render scaled text at the specified position using the bitmap font
@@ -88,11 +83,8 @@ void render_bitmap_text(const bitmap_font_ptr font,
  */
 void render_bitmap_text_scaled(const bitmap_font_ptr font,
                                const graphics_context_ptr graphics_context,
-                               const char* text,
-                               int x,
-                               int y,
-                               font_color_t color,
-                               int scale);
+                               const char* text, int x, int y,
+                               font_color_t color, int scale);
 
 /**
  * Get the width in pixels of the rendered text
@@ -111,8 +103,8 @@ int get_bitmap_text_width(const bitmap_font_ptr font, const char* text);
  * @param scale Scale factor
  * @return Width in pixels
  */
-int get_bitmap_text_width_scaled(const bitmap_font_ptr font,
-                                  const char* text, int scale);
+int get_bitmap_text_width_scaled(const bitmap_font_ptr font, const char* text,
+                                 int scale);
 
 /**
  * Free bitmap font resources

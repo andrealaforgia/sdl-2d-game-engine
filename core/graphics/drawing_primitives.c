@@ -57,20 +57,19 @@ ALWAYS_INLINE void draw_line_between_points(
 }
 
 ALWAYS_INLINE void draw_pixel(const graphics_context_ptr graphics_context,
-                               int x, int y, color_t color) {
+                              int x, int y, color_t color) {
   SDL_SetRenderDrawColor(graphics_context->renderer, R(color), G(color),
                          B(color), 255);
   SDL_RenderDrawPoint(graphics_context->renderer, x, y);
 }
 
 ALWAYS_INLINE void draw_point(const graphics_context_ptr graphics_context,
-                               const point_ptr p, color_t color) {
+                              const point_ptr p, color_t color) {
   draw_pixel(graphics_context, p->x, p->y, color);
 }
 
-ALWAYS_INLINE void draw_fat_pixel(
-    const graphics_context_ptr graphics_context, const point_ptr p,
-    color_t color) {
+ALWAYS_INLINE void draw_fat_pixel(const graphics_context_ptr graphics_context,
+                                  const point_ptr p, color_t color) {
   SDL_SetRenderDrawColor(graphics_context->renderer, R(color), G(color),
                          B(color), 255);
   // Draw a 5x5 square for thicker bullets
@@ -80,9 +79,8 @@ ALWAYS_INLINE void draw_fat_pixel(
   }
 }
 
-void draw_circle(const graphics_context_ptr graphics_context,
-                 int32_t centreX, int32_t centreY, int32_t radius,
-                 color_t color) {
+void draw_circle(const graphics_context_ptr graphics_context, int32_t centreX,
+                 int32_t centreY, int32_t radius, color_t color) {
   // Pre-allocate points array for batched rendering
   SDL_Point points[CIRCLE_POINTS];
 

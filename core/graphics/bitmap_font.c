@@ -7,9 +7,8 @@
 #include "texture.h"
 
 // Get the sprite coordinates for a character
-static bool get_char_sprite_rect(char c, int* out_x, int* out_y,
-                                   int char_width, int char_height,
-                                   int row_spacing) {
+static bool get_char_sprite_rect(char c, int* out_x, int* out_y, int char_width,
+                                 int char_height, int row_spacing) {
   (void)char_height;  // Suppress unused parameter warning
   c = toupper(c);
 
@@ -59,11 +58,9 @@ static bool get_char_sprite_rect(char c, int* out_x, int* out_y,
 }
 
 bitmap_font_t load_bitmap_font(const graphics_context_ptr graphics_context,
-                                const char* sprite_sheet_path,
-                                int char_width,
-                                int char_height,
-                                int row_spacing,
-                                int color_offset) {
+                               const char* sprite_sheet_path, int char_width,
+                               int char_height, int row_spacing,
+                               int color_offset) {
   bitmap_font_t font = {0};
 
   font.texture = load_texture(graphics_context->renderer, sprite_sheet_path);
@@ -83,11 +80,8 @@ bitmap_font_t load_bitmap_font(const graphics_context_ptr graphics_context,
 }
 
 void render_bitmap_text(const bitmap_font_ptr font,
-                         const graphics_context_ptr graphics_context,
-                         const char* text,
-                         int x,
-                         int y,
-                         font_color_t color) {
+                        const graphics_context_ptr graphics_context,
+                        const char* text, int x, int y, font_color_t color) {
   if (!font || !font->texture.texture || !text || !graphics_context) {
     return;
   }
@@ -106,20 +100,11 @@ void render_bitmap_text(const bitmap_font_ptr font,
 
     int char_x, char_y;
     if (get_char_sprite_rect(c, &char_x, &char_y, font->char_width,
-                              font->char_height, font->row_spacing)) {
-      SDL_Rect src_rect = {
-        char_x,
-        char_y + color_y_offset,
-        font->char_width,
-        font->char_height
-      };
+                             font->char_height, font->row_spacing)) {
+      SDL_Rect src_rect = {char_x, char_y + color_y_offset, font->char_width,
+                           font->char_height};
 
-      SDL_Rect dest_rect = {
-        cursor_x,
-        y,
-        font->char_width,
-        font->char_height
-      };
+      SDL_Rect dest_rect = {cursor_x, y, font->char_width, font->char_height};
 
       SDL_RenderCopy(graphics_context->renderer, font->texture.texture,
                      &src_rect, &dest_rect);
@@ -131,11 +116,8 @@ void render_bitmap_text(const bitmap_font_ptr font,
 
 void render_bitmap_text_scaled(const bitmap_font_ptr font,
                                const graphics_context_ptr graphics_context,
-                               const char* text,
-                               int x,
-                               int y,
-                               font_color_t color,
-                               int scale) {
+                               const char* text, int x, int y,
+                               font_color_t color, int scale) {
   if (!font || !font->texture.texture || !text || !graphics_context ||
       scale <= 0) {
     return;
@@ -156,11 +138,9 @@ void render_bitmap_text_scaled(const bitmap_font_ptr font,
 
     int char_x, char_y;
     if (get_char_sprite_rect(c, &char_x, &char_y, font->char_width,
-                              font->char_height, font->row_spacing)) {
-      rect_t src_rect = make_rect(char_x,
-                                  char_y + color_y_offset,
-                                  font->char_width,
-                                  font->char_height);
+                             font->char_height, font->row_spacing)) {
+      rect_t src_rect = make_rect(char_x, char_y + color_y_offset,
+                                  font->char_width, font->char_height);
 
       render_sprite_scaled(graphics_context, &font->texture, &src_rect,
                            cursor_x, y, scale);
@@ -178,8 +158,8 @@ int get_bitmap_text_width(const bitmap_font_ptr font, const char* text) {
   return strlen(text) * font->char_width;
 }
 
-int get_bitmap_text_width_scaled(const bitmap_font_ptr font,
-                                  const char* text, int scale) {
+int get_bitmap_text_width_scaled(const bitmap_font_ptr font, const char* text,
+                                 int scale) {
   if (!font || !text || scale <= 0) {
     return 0;
   }

@@ -16,13 +16,13 @@
 // Generic object pool for efficient memory management
 // Provides constant-time allocation and deallocation
 typedef struct {
-  void* objects;           // Contiguous array of objects
-  size_t object_size;      // Size of each object in bytes
-  size_t capacity;         // Maximum number of objects
-  size_t* free_indices;    // Stack of available indices
-  size_t free_count;       // Number of free slots
-  bool* active_flags;      // Which slots are currently active
-  size_t active_count;     // Number of active objects
+  void* objects;         // Contiguous array of objects
+  size_t object_size;    // Size of each object in bytes
+  size_t capacity;       // Maximum number of objects
+  size_t* free_indices;  // Stack of available indices
+  size_t free_count;     // Number of free slots
+  bool* active_flags;    // Which slots are currently active
+  size_t active_count;   // Number of active objects
 } object_pool_t;
 
 // Create an object pool with specified object size and capacity

@@ -13,8 +13,8 @@
 #include <SDL.h>
 
 #include "geometry.h"
-#include "graphics_context.h"
 #include "graphics.h"
+#include "graphics_context.h"
 
 typedef struct {
   int width;

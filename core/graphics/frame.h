@@ -10,8 +10,8 @@
 #ifndef CORE_GRAPHICS_FRAME_H_
 #define CORE_GRAPHICS_FRAME_H_
 
-#include "graphics_context.h"
 #include "graphics.h"
+#include "graphics_context.h"
 
 void clear_frame(const graphics_context_ptr graphics_context);
 void render_frame(const graphics_context_ptr graphics_context);

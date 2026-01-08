@@ -2,8 +2,9 @@
  * @file graphics_context.h
  * @brief Graphics context initialization and management
  *
- * Provides centralized graphics subsystem initialization and context management.
- * Extracted from the god object graphics.c for better separation of concerns.
+ * Provides centralized graphics subsystem initialization and context
+ * management. Extracted from the god object graphics.c for better separation of
+ * concerns.
  */
 
 #ifndef CORE_GRAPHICS_GRAPHICS_CONTEXT_H_
@@ -11,8 +12,9 @@
 
 #include <SDL.h>
 #include <stdbool.h>
-#include "window_mode.h"
+
 #include "geometry.h"
+#include "window_mode.h"
 
 // Graphics context structure definition
 typedef struct graphics_context {
@@ -52,8 +54,8 @@ bool validate_display_configuration(int* display, int* display_mode,
  * @return Created window or NULL on failure
  */
 SDL_Window* create_application_window(const char* title,
-                                      window_mode_t window_mode,
-                                      int display, int width, int height,
+                                      window_mode_t window_mode, int display,
+                                      int width, int height,
                                       SDL_DisplayMode* display_mode);
 
 /**
@@ -62,19 +64,17 @@ SDL_Window* create_application_window(const char* title,
  * @param vsync Enable vertical synchronization
  * @return Created renderer or NULL on failure
  */
-SDL_Renderer* create_application_renderer(SDL_Window* window,
-                                           bool vsync);
+SDL_Renderer* create_application_renderer(SDL_Window* window, bool vsync);
 
 /**
  * @brief Initialize complete graphics context
  * @param display Display index
- * @param display_mode Display mode index  
+ * @param display_mode Display mode index
  * @param window_mode Window mode configuration
  * @param vsync Enable vertical synchronization
  * @return Initialized graphics context
  */
-graphics_context_t initialize_graphics_context(int display,
-                                               int display_mode,
+graphics_context_t initialize_graphics_context(int display, int display_mode,
                                                window_mode_t window_mode,
                                                bool vsync);
 

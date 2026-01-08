@@ -11,8 +11,8 @@
 #define CORE_MATH_ANIMATE_H_
 
 #include "geometry.h"
-#include "graphics_context.h"
 #include "graphics.h"
+#include "graphics_context.h"
 #include "physics.h"
 
 void animate(const point_ptr position, const velocity_ptr velocity,

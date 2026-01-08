@@ -2,8 +2,9 @@
  * @file display_manager.h
  * @brief Display mode validation and window management
  *
- * Contains functions for display enumeration, mode validation, and window controls.
- * Handles SDL display queries, fullscreen toggling, and display information reporting.
+ * Contains functions for display enumeration, mode validation, and window
+ * controls. Handles SDL display queries, fullscreen toggling, and display
+ * information reporting.
  */
 
 #ifndef CORE_GRAPHICS_DISPLAY_MANAGER_H_
@@ -31,7 +32,7 @@ SDL_DisplayMode* get_display_modes(int display_index,
 
 /**
  * @brief Print comprehensive graphics and display information
- * 
+ *
  * Outputs information about all available displays, their modes,
  * bit depths, formats, and resolutions. Useful for debugging.
  */
@@ -40,7 +41,7 @@ void print_graphics_info(void);
 /**
  * @brief Toggle fullscreen mode for a graphics context window
  * @param graphics_context Graphics context containing the window to toggle
- * 
+ *
  * Switches between windowed and borderless fullscreen modes.
  * Logs the current mode change for user feedback.
  */

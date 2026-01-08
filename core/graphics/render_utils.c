@@ -20,7 +20,6 @@ ALWAYS_INLINE double wrap(double value, double upper_bound) {
   return value;
 }
 
-
 ALWAYS_INLINE point_t
 random_screen_point(const graphics_context_ptr graphics_context) {
   return random_point(graphics_context->screen_width,

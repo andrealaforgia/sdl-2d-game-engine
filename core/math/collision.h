@@ -12,11 +12,11 @@
 
 /**
  * @brief Axis-Aligned Bounding Box (AABB) collision detection
- * 
+ *
  * Tests if two rectangular bounding boxes overlap.
  *
  * @param x1 X position of first rectangle
- * @param y1 Y position of first rectangle  
+ * @param y1 Y position of first rectangle
  * @param w1 Width of first rectangle
  * @param h1 Height of first rectangle
  * @param x2 X position of second rectangle
@@ -25,7 +25,7 @@
  * @param h2 Height of second rectangle
  * @return true if rectangles overlap, false otherwise
  */
-bool aabb_collision(float x1, float y1, float w1, float h1,
-                   float x2, float y2, float w2, float h2);
+bool aabb_collision(float x1, float y1, float w1, float h1, float x2, float y2,
+                    float w2, float h2);
 
 #endif  // CORE_MATH_COLLISION_H_

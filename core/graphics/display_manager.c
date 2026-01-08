@@ -12,20 +12,18 @@
 #include "graphics.h"
 #include "logger.h"
 
-int get_display_count(void) {
-    return SDL_GetNumVideoDisplays();
-}
+int get_display_count(void) { return SDL_GetNumVideoDisplays(); }
 
 SDL_DisplayMode* get_display_modes(int display_index,
-                                    int* p_display_mode_count) {
+                                   int* p_display_mode_count) {
   *p_display_mode_count = SDL_GetNumDisplayModes(display_index);
   if (*p_display_mode_count < 1) {
     LOG_SDL_ERROR("SDL_GetNumDisplayModes");
     return NULL;
   }
 
-  SDL_DisplayMode* display_modes = calloc(*p_display_mode_count,
-                                          sizeof(SDL_DisplayMode));
+  SDL_DisplayMode* display_modes =
+      calloc(*p_display_mode_count, sizeof(SDL_DisplayMode));
 
   for (int i = 0; i < *p_display_mode_count; i++) {
     if (SDL_GetDisplayMode(display_index, i, &display_modes[i]) != 0) {
@@ -49,8 +47,8 @@ void print_graphics_info(void) {
   for (int display_index = 0; display_index < display_count; display_index++) {
     LOG_INFO_FMT("Display Index: %d", display_index);
     int display_mode_count;
-    SDL_DisplayMode* display_modes = get_display_modes(display_index,
-                                                        &display_mode_count);
+    SDL_DisplayMode* display_modes =
+        get_display_modes(display_index, &display_mode_count);
     if (display_modes) {
       for (int dm = 0; dm < display_mode_count; dm++) {
         LOG_INFO_FMT("Display Mode %d\tbpp %d\t%s\t%d x %d", dm,

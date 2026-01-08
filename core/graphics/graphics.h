@@ -14,13 +14,12 @@
 #include <stdbool.h>
 
 #include "color.h"
-#include "geometry.h"
-#include "window_mode.h"
-#include "graphics_context.h"
-
-#include "drawing_primitives.h"
 #include "display_manager.h"
+#include "drawing_primitives.h"
+#include "geometry.h"
+#include "graphics_context.h"
 #include "render_utils.h"
+#include "window_mode.h"
 
 graphics_context_t init_graphics_context(int display, int display_mode,
                                          window_mode_t window_mode, bool vsync);

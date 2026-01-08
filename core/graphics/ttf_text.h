@@ -13,8 +13,8 @@
 #include <SDL_ttf.h>
 #include <stdbool.h>
 
-#include "graphics_context.h"
 #include "graphics.h"
+#include "graphics_context.h"
 
 /**
  * Opaque handle to a TTF font
