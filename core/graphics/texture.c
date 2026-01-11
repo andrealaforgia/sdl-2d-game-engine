@@ -142,6 +142,37 @@ void render_sprite_scaled(const graphics_context_ptr graphics_context,
   SDL_RenderCopy(graphics_context->renderer, tex->texture, &src, &dst);
 }
 
+void render_sprite_scaled_alpha(const graphics_context_ptr graphics_context,
+                                const texture_ptr tex, const rect_t* src_rect, int x,
+                                int y, int scale, int alpha) {
+  if (!graphics_context || !tex || !tex->texture || scale <= 0) {
+    return;
+  }
+
+  // Save current alpha mod
+  Uint8 current_alpha;
+  SDL_GetTextureAlphaMod(tex->texture, &current_alpha);
+  
+  // Set desired alpha (clamp to 0-255 range)
+  Uint8 target_alpha = (alpha < 0) ? 0 : ((alpha > 255) ? 255 : (Uint8)alpha);
+  SDL_SetTextureAlphaMod(tex->texture, target_alpha);
+
+  SDL_Rect src = {0, 0, tex->width, tex->height};
+  if (src_rect) {
+    src.x = src_rect->x;
+    src.y = src_rect->y;
+    src.w = src_rect->w;
+    src.h = src_rect->h;
+  }
+
+  SDL_Rect dst = {x, y, src.w * scale, src.h * scale};
+
+  SDL_RenderCopy(graphics_context->renderer, tex->texture, &src, &dst);
+  
+  // Restore original alpha mod
+  SDL_SetTextureAlphaMod(tex->texture, current_alpha);
+}
+
 void render_sprite_flipped(const graphics_context_ptr graphics_context,
                            const texture_ptr tex, const rect_t* src_rect,
                            const rect_t* dst_rect, flip_t flip) {

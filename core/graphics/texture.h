@@ -41,6 +41,9 @@ void render_sprite(const graphics_context_ptr graphics_context,
 void render_sprite_scaled(const graphics_context_ptr graphics_context,
                           const texture_ptr tex, const rect_t* src_rect, int x,
                           int y, int scale);
+void render_sprite_scaled_alpha(const graphics_context_ptr graphics_context,
+                                const texture_ptr tex, const rect_t* src_rect, int x,
+                                int y, int scale, int alpha);
 void render_sprite_flipped(const graphics_context_ptr graphics_context,
                            const texture_ptr tex, const rect_t* src_rect,
                            const rect_t* dst_rect, flip_t flip);

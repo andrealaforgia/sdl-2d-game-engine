@@ -8,7 +8,8 @@
 
 #define SPACE_KEY_TICKS 150
 #define UP_KEY_TICKS 100
-#define LEFT_RIGHT_KEY_TICKS 15
+#define LEFT_RIGHT_KEY_TICKS 100  // Increased from 15 to prevent double key detection
+#define DOWN_KEY_TICKS 10
 #define S_KEY_TICKS 150
 #define F11_KEY_TICKS 500     // Longer debounce for toggle actions
 #define RETURN_KEY_TICKS 300  // Debounce for stage transitions
@@ -20,10 +21,15 @@ keyboard_state_t init_keyboard_state(void) {
   keyboard_state.up_key_last_ticks = get_clock_ticks_ms();
   keyboard_state.left_key_last_ticks = get_clock_ticks_ms();
   keyboard_state.right_key_last_ticks = get_clock_ticks_ms();
+  keyboard_state.down_key_last_ticks = get_clock_ticks_ms();
   keyboard_state.s_key_last_ticks = get_clock_ticks_ms();
   keyboard_state.f11_key_last_ticks = get_clock_ticks_ms();
   keyboard_state.return_key_last_ticks = get_clock_ticks_ms();
   return keyboard_state;
+}
+
+void update_keyboard_state(keyboard_state_ptr keyboard_state) {
+  keyboard_state->keys = SDL_GetKeyboardState(NULL);
 }
 
 ALWAYS_INLINE bool is_space_key_pressed(
@@ -65,6 +71,18 @@ ALWAYS_INLINE bool is_right_key_pressed(
       elapsed_from(keyboard_state->right_key_last_ticks) >
           LEFT_RIGHT_KEY_TICKS) {
     keyboard_state->right_key_last_ticks = get_clock_ticks_ms();
+    return true;
+  }
+  return false;
+}
+
+ALWAYS_INLINE bool is_down_key_pressed(
+    const keyboard_state_ptr keyboard_state) {
+  if ((keyboard_state->keys[SDL_SCANCODE_DOWN] ||
+       keyboard_state->keys[SDL_SCANCODE_J]) &&
+      elapsed_from(keyboard_state->down_key_last_ticks) >
+          DOWN_KEY_TICKS) {
+    keyboard_state->down_key_last_ticks = get_clock_ticks_ms();
     return true;
   }
   return false;

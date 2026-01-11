@@ -58,6 +58,23 @@ void render_arcade_text_scaled(const arcade_font_ptr font,
                                font_color_t color, int scale);
 
 /**
+ * Render scaled arcade text with alpha transparency at the specified position
+ *
+ * @param font Arcade font to use
+ * @param graphics_context Graphics context for rendering
+ * @param text Text string to render (supports A-Z, 0-9, !, /, -, space)
+ * @param x X position to render at
+ * @param y Y position to render at
+ * @param color Font color to use
+ * @param scale Scale factor (1 = normal size, 2 = double size, etc.)
+ * @param alpha Alpha value (0 = transparent, 255 = opaque)
+ */
+void render_arcade_text_scaled_alpha(const arcade_font_ptr font,
+                                     const graphics_context_ptr graphics_context,
+                                     const char* text, int x, int y,
+                                     font_color_t color, int scale, int alpha);
+
+/**
  * Get the width in pixels of rendered arcade text
  *
  * @param font Arcade font to measure with

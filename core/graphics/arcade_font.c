@@ -9,7 +9,7 @@
 #define ARCADE_FONT_CHAR_HEIGHT 7
 #define ARCADE_FONT_ROW_SPACING 8
 #define ARCADE_FONT_COLOR_OFFSET 32
-#define ARCADE_FONT_PATH "core/graphics/fonts/arcade-font.png"
+#define ARCADE_FONT_PATH "engine/core/graphics/fonts/arcade-font.png"
 
 arcade_font_t load_arcade_font(const graphics_context_ptr graphics_context) {
   arcade_font_t arcade_font = {0};
@@ -40,6 +40,14 @@ void render_arcade_text_scaled(const arcade_font_ptr font,
                                font_color_t color, int scale) {
   render_bitmap_text_scaled(&font->bitmap_font, graphics_context, text, x, y,
                             color, scale);
+}
+
+void render_arcade_text_scaled_alpha(const arcade_font_ptr font,
+                                     const graphics_context_ptr graphics_context,
+                                     const char* text, int x, int y,
+                                     font_color_t color, int scale, int alpha) {
+  render_bitmap_text_scaled_alpha(&font->bitmap_font, graphics_context, text, x, y,
+                                  color, scale, alpha);
 }
 
 int get_arcade_text_width(const arcade_font_ptr font, const char* text) {

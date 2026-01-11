@@ -110,4 +110,52 @@ void draw_filled_polygon(const graphics_context_ptr graphics_context,
  */
 void init_circle_lookup(void);
 
+/**
+ * @brief Draw a filled rectangle with specified color
+ * @param graphics_context Graphics context containing renderer
+ * @param x X coordinate of top-left corner
+ * @param y Y coordinate of top-left corner
+ * @param width Rectangle width
+ * @param height Rectangle height
+ * @param color Fill color
+ */
+void draw_filled_rect(const graphics_context_ptr graphics_context,
+                      int x, int y, int width, int height, color_t color);
+
+/**
+ * @brief Draw a filled rectangle with alpha blending
+ * @param graphics_context Graphics context containing renderer
+ * @param x X coordinate of top-left corner
+ * @param y Y coordinate of top-left corner
+ * @param width Rectangle width
+ * @param height Rectangle height
+ * @param color Fill color
+ * @param alpha Alpha value (0-255, where 255 is opaque)
+ */
+void draw_filled_rect_alpha(const graphics_context_ptr graphics_context,
+                            int x, int y, int width, int height,
+                            color_t color, uint8_t alpha);
+
+/**
+ * @brief Set the render draw color with alpha
+ * @param graphics_context Graphics context containing renderer
+ * @param color Color to set
+ * @param alpha Alpha value (0-255)
+ */
+void set_render_draw_color_alpha(const graphics_context_ptr graphics_context,
+                                 color_t color, uint8_t alpha);
+
+/**
+ * @brief Clear the screen with a specific color
+ * @param graphics_context Graphics context containing renderer
+ * @param color Clear color
+ */
+void clear_screen(const graphics_context_ptr graphics_context, color_t color);
+
+/**
+ * @brief Present the rendered frame to the screen
+ * @param graphics_context Graphics context containing renderer
+ */
+void present_frame(const graphics_context_ptr graphics_context);
+
 #endif  // CORE_GRAPHICS_DRAWING_PRIMITIVES_H_
