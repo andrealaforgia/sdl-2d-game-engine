@@ -92,6 +92,14 @@ ALWAYS_INLINE bool is_esc_key_pressed(const keyboard_state_ptr keyboard_state) {
   return keyboard_state->keys[SDL_SCANCODE_ESCAPE];
 }
 
+ALWAYS_INLINE bool is_y_key_pressed(const keyboard_state_ptr keyboard_state) {
+  return keyboard_state->keys[SDL_SCANCODE_Y];
+}
+
+ALWAYS_INLINE bool is_n_key_pressed(const keyboard_state_ptr keyboard_state) {
+  return keyboard_state->keys[SDL_SCANCODE_N];
+}
+
 ALWAYS_INLINE bool is_return_key_pressed(
     const keyboard_state_ptr keyboard_state) {
   if (keyboard_state->keys[SDL_SCANCODE_RETURN] &&

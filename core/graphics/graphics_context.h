@@ -84,4 +84,20 @@ graphics_context_t initialize_graphics_context(int display, int display_mode,
  */
 void terminate_graphics_context(graphics_context_t* context);
 
+/**
+ * @brief Shutdown graphics subsystems without a graphics context
+ *
+ * Use this when you've called initialize_graphics_subsystems() but
+ * haven't created a full graphics context (window/renderer).
+ */
+void shutdown_graphics_subsystems(void);
+
+/**
+ * @brief Get the size of a window
+ * @param window Window to query
+ * @param width Output width
+ * @param height Output height
+ */
+void get_window_size(SDL_Window* window, int* width, int* height);
+
 #endif  // CORE_GRAPHICS_GRAPHICS_CONTEXT_H_

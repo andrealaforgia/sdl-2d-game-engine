@@ -260,3 +260,11 @@ void terminate_graphics_context(graphics_context_t* context) {
 
   SDL_Quit();
 }
+
+void shutdown_graphics_subsystems(void) {
+  SDL_Quit();
+}
+
+void get_window_size(SDL_Window* window, int* width, int* height) {
+  SDL_GetWindowSize(window, width, height);
+}
