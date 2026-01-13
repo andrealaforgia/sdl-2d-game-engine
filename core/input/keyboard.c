@@ -11,6 +11,7 @@
 #define LEFT_RIGHT_KEY_TICKS 100  // Increased from 15 to prevent double key detection
 #define DOWN_KEY_TICKS 10
 #define S_KEY_TICKS 150
+#define P_KEY_TICKS 150
 #define F11_KEY_TICKS 500     // Longer debounce for toggle actions
 #define RETURN_KEY_TICKS 300  // Debounce for stage transitions
 
@@ -23,6 +24,7 @@ keyboard_state_t init_keyboard_state(void) {
   keyboard_state.right_key_last_ticks = get_clock_ticks_ms();
   keyboard_state.down_key_last_ticks = get_clock_ticks_ms();
   keyboard_state.s_key_last_ticks = get_clock_ticks_ms();
+  keyboard_state.p_key_last_ticks = get_clock_ticks_ms();
   keyboard_state.f11_key_last_ticks = get_clock_ticks_ms();
   keyboard_state.return_key_last_ticks = get_clock_ticks_ms();
   return keyboard_state;
@@ -114,6 +116,15 @@ ALWAYS_INLINE bool is_s_key_pressed(const keyboard_state_ptr keyboard_state) {
   if (keyboard_state->keys[SDL_SCANCODE_S] &&
       elapsed_from(keyboard_state->s_key_last_ticks) > S_KEY_TICKS) {
     keyboard_state->s_key_last_ticks = get_clock_ticks_ms();
+    return true;
+  }
+  return false;
+}
+
+ALWAYS_INLINE bool is_p_key_pressed(const keyboard_state_ptr keyboard_state) {
+  if (keyboard_state->keys[SDL_SCANCODE_P] &&
+      elapsed_from(keyboard_state->p_key_last_ticks) > P_KEY_TICKS) {
+    keyboard_state->p_key_last_ticks = get_clock_ticks_ms();
     return true;
   }
   return false;

@@ -23,6 +23,7 @@ typedef struct {
   int right_key_last_ticks;
   int down_key_last_ticks;
   int s_key_last_ticks;
+  int p_key_last_ticks;
   int f11_key_last_ticks;
   int return_key_last_ticks;
 } keyboard_state_t, *keyboard_state_ptr;
@@ -39,6 +40,7 @@ bool is_esc_key_pressed(const keyboard_state_ptr keyboard_state);
 bool is_y_key_pressed(const keyboard_state_ptr keyboard_state);
 bool is_n_key_pressed(const keyboard_state_ptr keyboard_state);
 bool is_s_key_pressed(const keyboard_state_ptr keyboard_state);
+bool is_p_key_pressed(const keyboard_state_ptr keyboard_state);
 bool is_return_key_pressed(const keyboard_state_ptr keyboard_state);
 bool is_f11_key_pressed(const keyboard_state_ptr keyboard_state);
 
