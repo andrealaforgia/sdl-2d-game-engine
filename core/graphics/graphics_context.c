@@ -22,7 +22,14 @@
   printf("ERROR: %s failed: %s\n", func, SDL_GetError())
 
 bool initialize_graphics_subsystems(void) {
-  if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+#ifdef __EMSCRIPTEN__
+  // Emscripten doesn't support haptic (force feedback)
+  Uint32 sdl_flags = SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS |
+                     SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER;
+#else
+  Uint32 sdl_flags = SDL_INIT_EVERYTHING;
+#endif
+  if (SDL_Init(sdl_flags) != 0) {
     LOG_SDL_ERROR("SDL_Init");
     return false;
   }
