@@ -37,6 +37,12 @@ bool is_left_key_pressed(const keyboard_state_ptr keyboard_state);
 bool is_right_key_pressed(const keyboard_state_ptr keyboard_state);
 bool is_down_key_pressed(const keyboard_state_ptr keyboard_state);
 bool is_esc_key_pressed(const keyboard_state_ptr keyboard_state);
+
+/* Non-debounced "held" variants for continuous input (e.g., movement) */
+bool is_left_key_held(const keyboard_state_ptr keyboard_state);
+bool is_right_key_held(const keyboard_state_ptr keyboard_state);
+bool is_up_key_held(const keyboard_state_ptr keyboard_state);
+bool is_down_key_held(const keyboard_state_ptr keyboard_state);
 bool is_y_key_pressed(const keyboard_state_ptr keyboard_state);
 bool is_n_key_pressed(const keyboard_state_ptr keyboard_state);
 bool is_s_key_pressed(const keyboard_state_ptr keyboard_state);

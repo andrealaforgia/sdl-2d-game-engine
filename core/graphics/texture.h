@@ -18,10 +18,15 @@ typedef struct {
   int height;
 } texture_t, *texture_ptr;
 
-// Rectangle structure for sprite rendering
+// Rectangle structure for sprite rendering (integer coordinates)
 typedef struct {
   int x, y, w, h;
 } rect_t;
+
+// Float rectangle structure for sub-pixel precision rendering
+typedef struct {
+  float x, y, w, h;
+} frect_t;
 
 // Flip flags for sprite rendering
 typedef enum { FLIP_NONE = 0, FLIP_HORIZONTAL = 1, FLIP_VERTICAL = 2 } flip_t;
@@ -51,8 +56,14 @@ void render_sprite_rotated(const graphics_context_ptr graphics_context,
                            const texture_ptr tex, const rect_t* src_rect,
                            const rect_t* dst_rect, double angle, flip_t flip);
 
+// Sub-pixel precision sprite rendering (for smooth movement)
+void render_sprite_f(const graphics_context_ptr graphics_context,
+                     const texture_ptr tex, const rect_t* src_rect,
+                     const frect_t* dst_rect);
+
 // Utility functions
 rect_t make_rect(int x, int y, int w, int h);
+frect_t make_frect(float x, float y, float w, float h);
 void set_logical_size(const graphics_context_ptr graphics_context, int width,
                       int height);
 

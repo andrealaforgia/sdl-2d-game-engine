@@ -250,6 +250,39 @@ rect_t make_rect(int x, int y, int w, int h) {
   return rect;
 }
 
+frect_t make_frect(float x, float y, float w, float h) {
+  frect_t rect = {x, y, w, h};
+  return rect;
+}
+
+void render_sprite_f(const graphics_context_ptr graphics_context,
+                     const texture_ptr tex, const rect_t* src_rect,
+                     const frect_t* dst_rect) {
+  if (!graphics_context || !tex || !tex->texture) {
+    return;
+  }
+
+  SDL_Rect src = {0, 0, tex->width, tex->height};
+  SDL_FRect dst = {0.0f, 0.0f, (float)tex->width, (float)tex->height};
+
+  if (src_rect) {
+    src.x = src_rect->x;
+    src.y = src_rect->y;
+    src.w = src_rect->w;
+    src.h = src_rect->h;
+  }
+
+  if (dst_rect) {
+    dst.x = dst_rect->x;
+    dst.y = dst_rect->y;
+    dst.w = dst_rect->w;
+    dst.h = dst_rect->h;
+  }
+
+  // Use SDL_RenderCopyF for sub-pixel precision rendering (smoother movement)
+  SDL_RenderCopyF(graphics_context->renderer, tex->texture, &src, &dst);
+}
+
 void set_logical_size(const graphics_context_ptr graphics_context, int width,
                       int height) {
   if (!graphics_context) {

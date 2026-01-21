@@ -78,6 +78,62 @@ ALWAYS_INLINE bool is_right_key_pressed(
   return false;
 }
 
+/**
+ * @brief Check if left key is currently held down (no debouncing)
+ *
+ * Use this for continuous movement where you need to check every frame.
+ * Unlike is_left_key_pressed(), this has no debounce timer.
+ *
+ * @param keyboard_state Pointer to keyboard state
+ * @return true if left arrow or H key is currently held down
+ */
+ALWAYS_INLINE bool is_left_key_held(const keyboard_state_ptr keyboard_state) {
+  return keyboard_state->keys[SDL_SCANCODE_LEFT] ||
+         keyboard_state->keys[SDL_SCANCODE_H];
+}
+
+/**
+ * @brief Check if right key is currently held down (no debouncing)
+ *
+ * Use this for continuous movement where you need to check every frame.
+ * Unlike is_right_key_pressed(), this has no debounce timer.
+ *
+ * @param keyboard_state Pointer to keyboard state
+ * @return true if right arrow or L key is currently held down
+ */
+ALWAYS_INLINE bool is_right_key_held(const keyboard_state_ptr keyboard_state) {
+  return keyboard_state->keys[SDL_SCANCODE_RIGHT] ||
+         keyboard_state->keys[SDL_SCANCODE_L];
+}
+
+/**
+ * @brief Check if up key is currently held down (no debouncing)
+ *
+ * Use this for continuous movement where you need to check every frame.
+ * Unlike is_up_key_pressed(), this has no debounce timer.
+ *
+ * @param keyboard_state Pointer to keyboard state
+ * @return true if up arrow or K key is currently held down
+ */
+ALWAYS_INLINE bool is_up_key_held(const keyboard_state_ptr keyboard_state) {
+  return keyboard_state->keys[SDL_SCANCODE_UP] ||
+         keyboard_state->keys[SDL_SCANCODE_K];
+}
+
+/**
+ * @brief Check if down key is currently held down (no debouncing)
+ *
+ * Use this for continuous movement where you need to check every frame.
+ * Unlike is_down_key_pressed(), this has no debounce timer.
+ *
+ * @param keyboard_state Pointer to keyboard state
+ * @return true if down arrow or J key is currently held down
+ */
+ALWAYS_INLINE bool is_down_key_held(const keyboard_state_ptr keyboard_state) {
+  return keyboard_state->keys[SDL_SCANCODE_DOWN] ||
+         keyboard_state->keys[SDL_SCANCODE_J];
+}
+
 ALWAYS_INLINE bool is_down_key_pressed(
     const keyboard_state_ptr keyboard_state) {
   if ((keyboard_state->keys[SDL_SCANCODE_DOWN] ||
