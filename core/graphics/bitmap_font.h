@@ -99,10 +99,9 @@ void render_bitmap_text_scaled(const bitmap_font_ptr font,
  * @param scale Scale factor (1 = normal size, 2 = double size, etc.)
  * @param alpha Alpha value (0 = transparent, 255 = opaque)
  */
-void render_bitmap_text_scaled_alpha(const bitmap_font_ptr font,
-                                     const graphics_context_ptr graphics_context,
-                                     const char* text, int x, int y,
-                                     font_color_t color, int scale, int alpha);
+void render_bitmap_text_scaled_alpha(
+    const bitmap_font_ptr font, const graphics_context_ptr graphics_context,
+    const char* text, int x, int y, font_color_t color, int scale, int alpha);
 
 /**
  * Get the width in pixels of the rendered text

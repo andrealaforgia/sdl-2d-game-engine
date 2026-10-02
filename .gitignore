@@ -30,3 +30,6 @@
 build/
 bin/
 lib/
+
+*.d
+__pycache__/

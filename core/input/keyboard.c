@@ -8,7 +8,8 @@
 
 #define SPACE_KEY_TICKS 150
 #define UP_KEY_TICKS 100
-#define LEFT_RIGHT_KEY_TICKS 100  // Increased from 15 to prevent double key detection
+#define LEFT_RIGHT_KEY_TICKS \
+  100  // Increased from 15 to prevent double key detection
 #define DOWN_KEY_TICKS 10
 #define S_KEY_TICKS 150
 #define P_KEY_TICKS 150
@@ -16,7 +17,7 @@
 #define RETURN_KEY_TICKS 300  // Debounce for stage transitions
 
 keyboard_state_t init_keyboard_state(void) {
-  keyboard_state_t keyboard_state;
+  keyboard_state_t keyboard_state = {0};
   keyboard_state.keys = SDL_GetKeyboardState(NULL);
   keyboard_state.space_key_last_ticks = get_clock_ticks_ms();
   keyboard_state.up_key_last_ticks = get_clock_ticks_ms();
@@ -138,8 +139,7 @@ ALWAYS_INLINE bool is_down_key_pressed(
     const keyboard_state_ptr keyboard_state) {
   if ((keyboard_state->keys[SDL_SCANCODE_DOWN] ||
        keyboard_state->keys[SDL_SCANCODE_J]) &&
-      elapsed_from(keyboard_state->down_key_last_ticks) >
-          DOWN_KEY_TICKS) {
+      elapsed_from(keyboard_state->down_key_last_ticks) > DOWN_KEY_TICKS) {
     keyboard_state->down_key_last_ticks = get_clock_ticks_ms();
     return true;
   }
@@ -169,12 +169,10 @@ ALWAYS_INLINE bool is_return_key_pressed(
 }
 
 ALWAYS_INLINE bool is_s_key_pressed(const keyboard_state_ptr keyboard_state) {
-  if (keyboard_state->keys[SDL_SCANCODE_S] &&
-      elapsed_from(keyboard_state->s_key_last_ticks) > S_KEY_TICKS) {
-    keyboard_state->s_key_last_ticks = get_clock_ticks_ms();
-    return true;
-  }
-  return false;
+  bool down = keyboard_state->keys[SDL_SCANCODE_S] != 0;
+  bool pressed = down && !keyboard_state->s_key_was_down;
+  keyboard_state->s_key_was_down = down;
+  return pressed;
 }
 
 ALWAYS_INLINE bool is_p_key_pressed(const keyboard_state_ptr keyboard_state) {
@@ -187,10 +185,8 @@ ALWAYS_INLINE bool is_p_key_pressed(const keyboard_state_ptr keyboard_state) {
 }
 
 ALWAYS_INLINE bool is_f11_key_pressed(const keyboard_state_ptr keyboard_state) {
-  if (keyboard_state->keys[SDL_SCANCODE_F11] &&
-      elapsed_from(keyboard_state->f11_key_last_ticks) > F11_KEY_TICKS) {
-    keyboard_state->f11_key_last_ticks = get_clock_ticks_ms();
-    return true;
-  }
-  return false;
+  bool down = keyboard_state->keys[SDL_SCANCODE_F11] != 0;
+  bool pressed = down && !keyboard_state->f11_key_was_down;
+  keyboard_state->f11_key_was_down = down;
+  return pressed;
 }

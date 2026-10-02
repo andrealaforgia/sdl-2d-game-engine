@@ -1,3 +1,5 @@
+.DEFAULT_GOAL := all
+
 CC = gcc
 
 UNAME_S := $(shell uname -s)
@@ -35,12 +37,15 @@ HEADERS = $(wildcard $(SRCDIR)/*.h) \
           $(wildcard $(CORE_GRAPHICS_DIR)/*.h) $(wildcard $(CORE_MATH_DIR)/*.h) $(wildcard $(CORE_INPUT_DIR)/*.h) $(wildcard $(CORE_AUDIO_DIR)/*.h) $(wildcard $(CORE_TIME_DIR)/*.h) $(wildcard $(CORE_UTILS_DIR)/*.h) $(wildcard $(CORE_MEMORY_DIR)/*.h) $(wildcard $(CORE_EVENTS_DIR)/*.h)
 
 OBJ = $(SRC:.c=.o)
+DEP = $(OBJ:.o=.d)
+
+-include $(DEP)
 
 # Add include paths
 INCLUDES = -I. \
            -I$(CORE_GRAPHICS_DIR) -I$(CORE_MATH_DIR) -I$(CORE_INPUT_DIR) -I$(CORE_AUDIO_DIR) -I$(CORE_TIME_DIR) -I$(CORE_UTILS_DIR) -I$(CORE_MEMORY_DIR) -I$(CORE_EVENTS_DIR)
 
-CFLAGS := -ggdb3 -O3 -ffast-math --std=c99 -Wall -Wextra -pedantic-errors $(INCLUDES) $(SDL2_CFLAGS)
+CFLAGS := -ggdb3 -O3 --std=c99 -Wall -Wextra -pedantic-errors $(INCLUDES) $(SDL2_CFLAGS)
 LFLAGS := $(SDL2_LFLAGS) -lm
 
 # Library target for the engine
@@ -63,7 +68,7 @@ $(LIB_TARGET): $(OBJ)
 	$(AR) rcs $@ $^
 
 %.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -MMD -MP -c -o $@ $<
 
 install:
 	git submodule update --init --recursive
@@ -74,10 +79,10 @@ dev_install:
 	$(DEV_INSTALL_CMD)
 
 lint:
-	cpplint --filter=-build/include_subdir,-legal/copyright,-runtime/threadsafe_fn,-readability/casting $(SRC) $(HEADERS)
+	cpplint --filter=-build/include_subdir,-legal/copyright,-runtime/threadsafe_fn,-readability/casting $(SRC) $(HEADERS) tests/*.c tests/*.h
 
 clean:
-	rm -f $(OBJ) $(LIB_TARGET) $(ARCADE_FONT_TEST)
+	rm -f $(OBJ) $(DEP) $(LIB_TARGET) $(ARCADE_FONT_TEST)
 
 format:
 	clang-format -i -style=Google $(SRC) $(HEADERS)
@@ -91,3 +96,11 @@ show_sdl_config:
 	@echo "Library Paths:"
 	@ldconfig -p | grep SDL || echo "No SDL libraries found in ldconfig"
 
+
+.PHONY: test sanitize
+
+test:
+	python3 tests/run_tests.py
+
+sanitize:
+	python3 tests/run_tests.py --sanitize

@@ -364,3 +364,10 @@ MIT License - See LICENSE file for details
 Created by Andrea Laforgia
 
 Built with SDL2 by Sam Lantinga and contributors
+
+## Automated checks
+
+`make test` runs focused C contract tests with a controlled clock and injected
+allocation failures. `make sanitize` runs the same tests with AddressSanitizer
+and UndefinedBehaviourSanitizer. Python 3 and the SDL libraries are required;
+the checks do not create a window or run an interactive application.

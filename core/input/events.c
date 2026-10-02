@@ -17,3 +17,14 @@ ALWAYS_INLINE event_t poll_event(void) {
   }
   return OTHER_EVENT;
 }
+
+event_t drain_events(void) {
+  event_t result = NO_EVENT;
+  event_t event;
+  while ((event = poll_event()) != NO_EVENT) {
+    if (event == QUIT_EVENT) {
+      result = QUIT_EVENT;
+    }
+  }
+  return result;
+}

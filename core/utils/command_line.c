@@ -1,5 +1,8 @@
 #include "command_line.h"
 
+#include <errno.h>
+#include <limits.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -39,7 +42,15 @@ static int extract_numeric_argument(const char* prefix, const char* argument,
   size_t argument_length = strlen(argument);
   if (!strncmp(prefix, argument, prefix_length) &&
       argument_length > prefix_length) {
-    *p_number = strtoul(&argument[prefix_length], NULL, 0);
+    char* end;
+    errno = 0;
+    int64_t value = strtol(&argument[prefix_length], &end, 10);
+    if (errno == ERANGE || end == &argument[prefix_length] || *end != '\0' ||
+        value < 0 || value > INT_MAX) {
+      fprintf(stderr, "Error: Invalid numeric option '%s'\n", argument);
+      exit(EXIT_FAILURE);
+    }
+    *p_number = (int)value;
     return 1;
   }
   return 0;
@@ -51,22 +62,16 @@ static bool parse_argument(const char* argument,
   int number;
   if (!strcmp(HELP, argument)) {
     options->help = true;
-
   } else if (!strcmp(SHOW_FPS, argument)) {
     options->show_fps = true;
-
   } else if (!strcmp(VSYNC, argument)) {
     options->vsync = true;
-
   } else if (!strcmp(GRAPHICS_INFO, argument)) {
     options->graphics_info = true;
-
   } else if (extract_numeric_argument(DISPLAY, argument, &number)) {
     options->display = number;
-
   } else if (extract_numeric_argument(DISPLAY_MODE, argument, &number)) {
     options->display_mode = number;
-
   } else if (extract_numeric_argument(WINDOW_MODE, argument, &number)) {
     int valid_window_mode = number >= 0 && number <= 3;
     if (!valid_window_mode) {
@@ -75,7 +80,6 @@ static bool parse_argument(const char* argument,
       exit(EXIT_FAILURE);
     }
     options->window_mode = number;
-
   } else if (extract_numeric_argument(FPS, argument, &number)) {
     if (number < 1 || number > 300) {
       fprintf(stderr, "Error: Invalid FPS %s (valid: 1-300)\n", argument);
@@ -83,7 +87,6 @@ static bool parse_argument(const char* argument,
       exit(EXIT_FAILURE);
     }
     options->fps = number;
-
   } else if (extract_numeric_argument(VOLUME, argument, &number)) {
     if (number < 0 || number > 128) {
       fprintf(stderr, "Error: Invalid volume %s (valid: 0-128)\n", argument);
@@ -91,7 +94,6 @@ static bool parse_argument(const char* argument,
       exit(EXIT_FAILURE);
     }
     options->volume = number;
-
   } else {
     // Argument not recognized
     return false;

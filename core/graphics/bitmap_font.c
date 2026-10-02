@@ -150,10 +150,9 @@ void render_bitmap_text_scaled(const bitmap_font_ptr font,
   }
 }
 
-void render_bitmap_text_scaled_alpha(const bitmap_font_ptr font,
-                                     const graphics_context_ptr graphics_context,
-                                     const char* text, int x, int y,
-                                     font_color_t color, int scale, int alpha) {
+void render_bitmap_text_scaled_alpha(
+    const bitmap_font_ptr font, const graphics_context_ptr graphics_context,
+    const char* text, int x, int y, font_color_t color, int scale, int alpha) {
   if (!font || !font->texture.texture || !text || !graphics_context ||
       scale <= 0) {
     return;

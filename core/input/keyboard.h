@@ -17,6 +17,8 @@
 
 typedef struct {
   const Uint8* keys;
+  bool s_key_was_down;
+  bool f11_key_was_down;
   int space_key_last_ticks;
   int up_key_last_ticks;
   int left_key_last_ticks;

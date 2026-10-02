@@ -143,8 +143,8 @@ void render_sprite_scaled(const graphics_context_ptr graphics_context,
 }
 
 void render_sprite_scaled_alpha(const graphics_context_ptr graphics_context,
-                                const texture_ptr tex, const rect_t* src_rect, int x,
-                                int y, int scale, int alpha) {
+                                const texture_ptr tex, const rect_t* src_rect,
+                                int x, int y, int scale, int alpha) {
   if (!graphics_context || !tex || !tex->texture || scale <= 0) {
     return;
   }
@@ -152,7 +152,7 @@ void render_sprite_scaled_alpha(const graphics_context_ptr graphics_context,
   // Save current alpha mod
   Uint8 current_alpha;
   SDL_GetTextureAlphaMod(tex->texture, &current_alpha);
-  
+
   // Set desired alpha (clamp to 0-255 range)
   Uint8 target_alpha = (alpha < 0) ? 0 : ((alpha > 255) ? 255 : (Uint8)alpha);
   SDL_SetTextureAlphaMod(tex->texture, target_alpha);
@@ -168,7 +168,7 @@ void render_sprite_scaled_alpha(const graphics_context_ptr graphics_context,
   SDL_Rect dst = {x, y, src.w * scale, src.h * scale};
 
   SDL_RenderCopy(graphics_context->renderer, tex->texture, &src, &dst);
-  
+
   // Restore original alpha mod
   SDL_SetTextureAlphaMod(tex->texture, current_alpha);
 }

@@ -1,10 +1,15 @@
 #include "object_pool.h"
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
 object_pool_t create_object_pool(size_t object_size, size_t capacity) {
-  object_pool_t pool;
+  object_pool_t pool = {0};
+  if (object_size == 0 || capacity == 0 || capacity > SIZE_MAX / object_size ||
+      capacity > SIZE_MAX / sizeof(size_t)) {
+    return pool;
+  }
   pool.object_size = object_size;
   pool.capacity = capacity;
   pool.active_count = 0;
@@ -18,6 +23,11 @@ object_pool_t create_object_pool(size_t object_size, size_t capacity) {
 
   // Allocate active flags
   pool.active_flags = malloc(sizeof(bool) * capacity);
+
+  if (!pool.objects || !pool.free_indices || !pool.active_flags) {
+    pool_destroy(&pool);
+    return pool;
+  }
 
   // Initialize all objects as inactive and add to free list
   for (size_t i = 0; i < capacity; i++) {

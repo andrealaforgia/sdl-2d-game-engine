@@ -18,5 +18,6 @@ typedef enum {
 } event_t;
 
 event_t poll_event(void);
+event_t drain_events(void);
 
 #endif  // CORE_INPUT_EVENTS_H_

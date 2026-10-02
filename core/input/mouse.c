@@ -106,7 +106,8 @@ ALWAYS_INLINE int get_mouse_delta_y(const mouse_state_ptr mouse_state) {
 /**
  * @brief Check if left mouse button is currently pressed
  */
-ALWAYS_INLINE bool is_mouse_left_button_pressed(const mouse_state_ptr mouse_state) {
+ALWAYS_INLINE bool is_mouse_left_button_pressed(
+    const mouse_state_ptr mouse_state) {
     if (mouse_state == NULL) {
         return false;
     }
@@ -116,7 +117,8 @@ ALWAYS_INLINE bool is_mouse_left_button_pressed(const mouse_state_ptr mouse_stat
 /**
  * @brief Check if right mouse button is currently pressed
  */
-ALWAYS_INLINE bool is_mouse_right_button_pressed(const mouse_state_ptr mouse_state) {
+ALWAYS_INLINE bool is_mouse_right_button_pressed(
+    const mouse_state_ptr mouse_state) {
     if (mouse_state == NULL) {
         return false;
     }
@@ -126,7 +128,8 @@ ALWAYS_INLINE bool is_mouse_right_button_pressed(const mouse_state_ptr mouse_sta
 /**
  * @brief Check if middle mouse button is currently pressed
  */
-ALWAYS_INLINE bool is_mouse_middle_button_pressed(const mouse_state_ptr mouse_state) {
+ALWAYS_INLINE bool is_mouse_middle_button_pressed(
+    const mouse_state_ptr mouse_state) {
     if (mouse_state == NULL) {
         return false;
     }

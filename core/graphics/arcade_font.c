@@ -14,10 +14,10 @@
 arcade_font_t load_arcade_font(const graphics_context_ptr graphics_context) {
   arcade_font_t arcade_font = {0};
 
-  arcade_font.bitmap_font = load_bitmap_font(
-      graphics_context, ARCADE_FONT_PATH, ARCADE_FONT_CHAR_WIDTH,
-      ARCADE_FONT_CHAR_HEIGHT, ARCADE_FONT_ROW_SPACING,
-      ARCADE_FONT_COLOR_OFFSET);
+  arcade_font.bitmap_font =
+      load_bitmap_font(graphics_context, ARCADE_FONT_PATH,
+                       ARCADE_FONT_CHAR_WIDTH, ARCADE_FONT_CHAR_HEIGHT,
+                       ARCADE_FONT_ROW_SPACING, ARCADE_FONT_COLOR_OFFSET);
 
   if (!arcade_font.bitmap_font.texture.texture) {
     LOG_ERROR("Failed to load arcade font");
@@ -42,12 +42,11 @@ void render_arcade_text_scaled(const arcade_font_ptr font,
                             color, scale);
 }
 
-void render_arcade_text_scaled_alpha(const arcade_font_ptr font,
-                                     const graphics_context_ptr graphics_context,
-                                     const char* text, int x, int y,
-                                     font_color_t color, int scale, int alpha) {
-  render_bitmap_text_scaled_alpha(&font->bitmap_font, graphics_context, text, x, y,
-                                  color, scale, alpha);
+void render_arcade_text_scaled_alpha(
+    const arcade_font_ptr font, const graphics_context_ptr graphics_context,
+    const char* text, int x, int y, font_color_t color, int scale, int alpha) {
+  render_bitmap_text_scaled_alpha(&font->bitmap_font, graphics_context, text, x,
+                                  y, color, scale, alpha);
 }
 
 int get_arcade_text_width(const arcade_font_ptr font, const char* text) {

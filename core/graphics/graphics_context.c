@@ -38,10 +38,6 @@ bool initialize_graphics_subsystems(void) {
   init_circle_lookup();
 
   // Set SDL hints for optimal performance
-  if (!SDL_SetHint(SDL_HINT_RENDER_DRIVER, "metal")) {
-    LOG_WARN("Failed to set Metal renderer hint");
-  }
-
   if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0")) {
     LOG_WARN("Failed to set render scale quality hint");
   }
@@ -268,9 +264,7 @@ void terminate_graphics_context(graphics_context_t* context) {
   SDL_Quit();
 }
 
-void shutdown_graphics_subsystems(void) {
-  SDL_Quit();
-}
+void shutdown_graphics_subsystems(void) { SDL_Quit(); }
 
 void get_window_size(SDL_Window* window, int* width, int* height) {
   SDL_GetWindowSize(window, width, height);
