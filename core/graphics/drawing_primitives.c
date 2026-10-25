@@ -130,22 +130,22 @@ void draw_filled_polygon(const graphics_context_ptr graphics_context,
   }
 }
 
-void draw_filled_rect(const graphics_context_ptr graphics_context,
-                      int x, int y, int width, int height, color_t color) {
+void draw_filled_rect(const graphics_context_ptr graphics_context, float x,
+                      float y, float width, float height, color_t color) {
   SDL_SetRenderDrawColor(graphics_context->renderer, R(color), G(color),
                          B(color), 255);
-  SDL_Rect rect = {x, y, width, height};
-  SDL_RenderFillRect(graphics_context->renderer, &rect);
+  SDL_FRect rect = {x, y, width, height};
+  SDL_RenderFillRectF(graphics_context->renderer, &rect);
 }
 
 void draw_filled_rect_alpha(const graphics_context_ptr graphics_context,
-                            int x, int y, int width, int height,
+                            float x, float y, float width, float height,
                             color_t color, uint8_t alpha) {
   SDL_SetRenderDrawBlendMode(graphics_context->renderer, SDL_BLENDMODE_BLEND);
   SDL_SetRenderDrawColor(graphics_context->renderer, R(color), G(color),
                          B(color), alpha);
-  SDL_Rect rect = {x, y, width, height};
-  SDL_RenderFillRect(graphics_context->renderer, &rect);
+  SDL_FRect rect = {x, y, width, height};
+  SDL_RenderFillRectF(graphics_context->renderer, &rect);
   SDL_SetRenderDrawBlendMode(graphics_context->renderer, SDL_BLENDMODE_NONE);
 }
 

@@ -21,7 +21,6 @@
 #include "render_utils.h"
 #include "window_mode.h"
 
-graphics_context_t init_graphics_context(int display, int display_mode,
-                                         window_mode_t window_mode, bool vsync);
+graphics_context_t init_graphics_context(const graphics_config_t* config);
 
 #endif  // CORE_GRAPHICS_GRAPHICS_H_

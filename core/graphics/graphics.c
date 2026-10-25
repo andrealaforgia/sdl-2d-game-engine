@@ -11,11 +11,8 @@
 #include "logger.h"
 #include "render_utils.h"
 
-graphics_context_t init_graphics_context(int display, int display_mode,
-                                         window_mode_t window_mode,
-                                         bool vsync) {
-  graphics_context_t context =
-      initialize_graphics_context(display, display_mode, window_mode, vsync);
+graphics_context_t init_graphics_context(const graphics_config_t* config) {
+  graphics_context_t context = initialize_graphics_context(config);
 
   if (!context.window || !context.renderer) {
     LOG_ERROR("Failed to initialize graphics context");

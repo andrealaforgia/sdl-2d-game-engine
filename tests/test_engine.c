@@ -9,6 +9,10 @@
 #include "command_line.h"
 #include "events.h"
 #include "geometry.h"
+#include "graphics.h"
+#include "pixel_font.h"
+#include "texture.h"
+#include "viewport.h"
 #include "physics.h"
 #include "rng.h"
 #include "stepper.h"
@@ -324,6 +328,57 @@ static void wav_files_are_converted_to_the_mixer_format(void) {
   remove(stereo);
   terminate_audio_context(audio);
 }
+static void the_viewport_keeps_the_height_and_lets_the_width_follow(void) {
+  float scale, width;
+  viewport_fit(1280, 720, 360.0f, &scale, &width);
+  assert(scale == 2.0f && width == 640.0f);
+  viewport_fit(1000, 720, 360.0f, &scale, &width);
+  assert(scale == 2.0f && width == 500.0f);
+  viewport_fit(0, 0, 360.0f, &scale, &width);
+  assert(scale > 0.0f && width > 0.0f);
+  viewport_fit(800, 600, 0.0f, &scale, &width);
+  assert(scale == 1.0f && width == 800.0f);
+}
+static void pixel_text_width_counts_cells_and_drops_the_trailing_gap(void) {
+  assert(pixel_text_width("", 1.0f) == -1.0f + 0.0f);
+  assert(pixel_text_width("AB", 1.0f) == 11.0f);
+  assert(pixel_text_width("AB", 3.0f) == 33.0f);
+}
+static void a_headless_window_scales_draws_and_saves_frames(void) {
+  setenv("SDL_VIDEODRIVER", "dummy", 1);
+  graphics_config_t config = default_graphics_config("Test");
+  config.width = 640;
+  config.height = 480;
+  config.window_mode = WINDOWED;
+  config.view_height = 240.0f;
+  graphics_context_t graphics = initialize_graphics_context(&config);
+  assert(graphics.window && graphics.renderer);
+  begin_frame(&graphics, 10, 20, 30);
+  assert(graphics.view_scale > 0.0f);
+  assert(graphics.view_width * graphics.view_scale > 639.0f);
+  draw_filled_rect_alpha(&graphics, 1.5f, 2.5f, 10.0f, 10.0f, COLOR_RED, 128);
+  uint32_t pixels[4] = {0xff0000ffu, 0xff00ff00u, 0xffff0000u, 0xffffffffu};
+  texture_t tex = texture_from_pixels(&graphics, pixels, 2, 2, false, false);
+  assert(tex.texture && tex.width == 2 && tex.height == 2);
+  draw_options_t options = {true, 0.5f, 90.0f, true, 255, 0, 0};
+  frect_t where = {20.0f, 20.0f, 8.0f, 8.0f};
+  render_sprite(&graphics, &tex, NULL, where, &options);
+  render_sprite(&graphics, &tex, NULL, where, NULL);
+  pixel_font_t font = build_pixel_font(&graphics);
+  assert(font.atlas.texture);
+  render_pixel_text(&font, &graphics, 4.0f, 4.0f, "Hi 12", 2.0f, 255, 255, 0);
+  const char* directory = getenv("TMPDIR") ? getenv("TMPDIR") : "/tmp";
+  char path[512];
+  snprintf(path, sizeof(path), "%s/engine-test-frame.bmp", directory);
+  assert(save_frame_bmp(&graphics, path));
+  FILE* file = fopen(path, "rb");
+  assert(file);
+  fclose(file);
+  remove(path);
+  free_pixel_font(&font);
+  free_texture(&tex);
+  terminate_graphics_context(&graphics);
+}
 int main(int argc, char** argv) {
   assert(argc >= 2);
   if (!strcmp(argv[1], "parse")) {
@@ -331,6 +386,12 @@ int main(int argc, char** argv) {
     parse_command_line_options(argc - 1, argv + 1, &options, NULL, 0);
     printf("fps=%d volume=%d mode=%d\n", options.fps, options.volume,
            options.window_mode);
+  } else if (!strcmp(argv[1], "viewport")) {
+    the_viewport_keeps_the_height_and_lets_the_width_follow();
+  } else if (!strcmp(argv[1], "pixel-text")) {
+    pixel_text_width_counts_cells_and_drops_the_trailing_gap();
+  } else if (!strcmp(argv[1], "headless-graphics")) {
+    a_headless_window_scales_draws_and_saves_frames();
   } else if (!strcmp(argv[1], "mixer")) {
     the_mixer_plays_a_sample_once_then_stops();
     the_mixer_saturates_instead_of_wrapping_and_steals_voices();

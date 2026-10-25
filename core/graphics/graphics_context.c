@@ -11,6 +11,7 @@
 
 #include "geometry.h"
 #include "graphics.h"
+#include "viewport.h"
 
 // Logging macros - simplified for context module
 #define LOG_INFO(msg) printf("INFO: %s\n", msg)
@@ -64,7 +65,6 @@ bool initialize_graphics_subsystems(void) {
     LOG_WARN("Failed to set mouse focus clickthrough hint");
   }
 
-  SDL_ShowCursor(SDL_DISABLE);
   return true;
 }
 
@@ -108,14 +108,34 @@ bool validate_display_configuration(int* display, int* display_mode,
   return true;
 }
 
-SDL_Window* create_application_window(const char* title,
-                                      window_mode_t window_mode, int display,
-                                      int width, int height,
+graphics_config_t default_graphics_config(const char* title) {
+  graphics_config_t config = {title,   0, 0, 0, 0, WINDOWED, true, 0.0f};
+  return config;
+}
+
+// A windowed game with no size asked fills the usable screen, borders
+// included, instead of opening at some display mode's resolution.
+static void fit_window_to_usable_screen(SDL_Window* window, int display) {
+  SDL_Rect usable;
+  if (SDL_GetDisplayUsableBounds(display, &usable) != 0) return;
+  int top = 0, left = 0, bottom = 0, right = 0;
+  if (SDL_GetWindowBordersSize(window, &top, &left, &bottom, &right) == 0) {
+    SDL_SetWindowSize(window, usable.w - left - right,
+                      usable.h - top - bottom);
+    SDL_SetWindowPosition(window, usable.x + left, usable.y + top);
+  }
+}
+
+SDL_Window* create_application_window(const graphics_config_t* config,
                                       SDL_DisplayMode* display_mode) {
   Uint32 window_flags = SDL_WINDOW_ALLOW_HIGHDPI;
+  int width = config->width > 0 ? config->width : display_mode->w;
+  int height = config->height > 0 ? config->height : display_mode->h;
+  bool fill_screen = config->window_mode == WINDOWED &&
+                     (config->width <= 0 || config->height <= 0);
 
   // Configure window flags based on mode
-  switch (window_mode) {
+  switch (config->window_mode) {
     case WINDOWED:
       window_flags |= SDL_WINDOW_RESIZABLE;
       LOG_INFO("Window mode: Windowed");
@@ -135,16 +155,19 @@ SDL_Window* create_application_window(const char* title,
   }
 
   SDL_Window* window = SDL_CreateWindow(
-      title, SDL_WINDOWPOS_CENTERED_DISPLAY(display),
-      SDL_WINDOWPOS_CENTERED_DISPLAY(display), width, height, window_flags);
+      config->title, SDL_WINDOWPOS_CENTERED_DISPLAY(config->display),
+      SDL_WINDOWPOS_CENTERED_DISPLAY(config->display), width, height,
+      window_flags);
 
   if (!window) {
     LOG_SDL_ERROR("SDL_CreateWindow");
     return NULL;
   }
 
+  if (fill_screen) fit_window_to_usable_screen(window, config->display);
+
   // Set display mode for true fullscreen
-  if (window_mode == FULLSCREEN) {
+  if (config->window_mode == FULLSCREEN) {
     if (SDL_SetWindowDisplayMode(window, display_mode) != 0) {
       LOG_SDL_ERROR("SDL_SetWindowDisplayMode");
       SDL_DestroyWindow(window);
@@ -209,45 +232,73 @@ SDL_Renderer* create_application_renderer(SDL_Window* window, bool vsync) {
   return renderer;
 }
 
-graphics_context_t initialize_graphics_context(int display, int display_mode,
-                                               window_mode_t window_mode,
-                                               bool vsync) {
+graphics_context_t initialize_graphics_context(
+    const graphics_config_t* config) {
   graphics_context_t context = {0};
+  graphics_config_t settings = *config;
 
   if (!initialize_graphics_subsystems()) {
     return context;  // Return empty context on failure
   }
 
   SDL_DisplayMode sdl_display_mode;
-  if (!validate_display_configuration(&display, &display_mode,
+  if (!validate_display_configuration(&settings.display,
+                                      &settings.display_mode,
                                       &sdl_display_mode)) {
     return context;
   }
 
-  context.screen_width = sdl_display_mode.w;
-  context.screen_height = sdl_display_mode.h;
-  context.screen_center =
-      point(context.screen_width / 2, context.screen_height / 2);
-
-  context.window = create_application_window(
-      "Asteroids", window_mode, display, context.screen_width,
-      context.screen_height, &sdl_display_mode);
+  context.window = create_application_window(&settings, &sdl_display_mode);
   if (!context.window) {
     return context;
   }
 
-  context.renderer = create_application_renderer(context.window, vsync);
+  context.renderer = create_application_renderer(context.window, settings.vsync);
   if (!context.renderer) {
     SDL_DestroyWindow(context.window);
     context.window = NULL;
     return context;
   }
+  SDL_SetRenderDrawBlendMode(context.renderer, SDL_BLENDMODE_BLEND);
+  if (settings.window_mode != WINDOWED) SDL_ShowCursor(SDL_DISABLE);
+
+  get_window_size(context.window, &context.screen_width,
+                  &context.screen_height);
+  context.screen_center =
+      point(context.screen_width / 2, context.screen_height / 2);
+  context.view_height = settings.view_height;
 
   int drawable_w, drawable_h;
   SDL_GL_GetDrawableSize(context.window, &drawable_w, &drawable_h);
   LOG_INFO_FMT("Drawable Size: w=%d h=%d", drawable_w, drawable_h);
 
   return context;
+}
+
+void begin_frame(graphics_context_t* context, uint8_t r, uint8_t g,
+                 uint8_t b) {
+  int out_w = 1, out_h = 1;
+  SDL_GetRendererOutputSize(context->renderer, &out_w, &out_h);
+  viewport_fit(out_w, out_h, context->view_height, &context->view_scale,
+               &context->view_width);
+  SDL_RenderSetScale(context->renderer, context->view_scale,
+                     context->view_scale);
+  SDL_SetRenderDrawColor(context->renderer, r, g, b, 255);
+  SDL_RenderClear(context->renderer);
+}
+
+bool save_frame_bmp(const graphics_context_t* context, const char* path) {
+  int w = 0, h = 0;
+  SDL_GetRendererOutputSize(context->renderer, &w, &h);
+  SDL_Surface* surface =
+      SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_ARGB8888);
+  if (!surface) return false;
+  bool ok = SDL_RenderReadPixels(context->renderer, NULL,
+                                 SDL_PIXELFORMAT_ARGB8888, surface->pixels,
+                                 surface->pitch) == 0 &&
+            SDL_SaveBMP(surface, path) == 0;
+  SDL_FreeSurface(surface);
+  return ok;
 }
 
 void terminate_graphics_context(graphics_context_t* context) {

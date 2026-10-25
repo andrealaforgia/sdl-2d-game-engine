@@ -20,10 +20,6 @@ texture_t load_texture(SDL_Renderer* renderer, const char* filepath) {
     return tex;
   }
 
-  // Set black color (RGB 0,0,0) as transparent
-  Uint32 black = SDL_MapRGB(surface->format, 0, 0, 0);
-  SDL_SetColorKey(surface, SDL_TRUE, black);
-
   tex.texture = SDL_CreateTextureFromSurface(renderer, surface);
   if (!tex.texture) {
     LOG_ERROR_FMT("Failed to create texture from %s: %s", filepath,
@@ -95,154 +91,62 @@ texture_t load_texture_with_colorkey(SDL_Renderer* renderer,
   return tex;
 }
 
+texture_t texture_from_pixels(const graphics_context_ptr graphics_context,
+                              const uint32_t* pixels, int width, int height,
+                              bool smooth, bool additive) {
+  texture_t tex = {NULL, 0, 0};
+  SDL_Surface* surface = SDL_CreateRGBSurfaceFrom(
+      (void*)pixels, width, height, 32, width * 4, 0x000000ffu, 0x0000ff00u,
+      0x00ff0000u, 0xff000000u);
+  if (!surface) return tex;
+  tex.texture =
+      SDL_CreateTextureFromSurface(graphics_context->renderer, surface);
+  SDL_FreeSurface(surface);
+  if (!tex.texture) return tex;
+  tex.width = width;
+  tex.height = height;
+  if (additive) SDL_SetTextureBlendMode(tex.texture, SDL_BLENDMODE_ADD);
+  set_texture_smooth(&tex, smooth);
+  return tex;
+}
+
+void set_texture_smooth(texture_ptr tex, bool smooth) {
+  if (!tex || !tex->texture) return;
+  SDL_SetTextureScaleMode(tex->texture, smooth ? SDL_ScaleModeLinear
+                                                : SDL_ScaleModeNearest);
+}
+
 void render_sprite(const graphics_context_ptr graphics_context,
                    const texture_ptr tex, const rect_t* src_rect,
-                   const rect_t* dst_rect) {
-  if (!graphics_context || !tex || !tex->texture) {
-    return;
-  }
-
-  SDL_Rect src = {0, 0, tex->width, tex->height};
-  SDL_Rect dst = {0, 0, tex->width, tex->height};
-
+                   frect_t dst_rect, const draw_options_t* options) {
+  if (!graphics_context || !tex || !tex->texture) return;
+  SDL_Rect source;
   if (src_rect) {
-    src.x = src_rect->x;
-    src.y = src_rect->y;
-    src.w = src_rect->w;
-    src.h = src_rect->h;
+    source.x = src_rect->x;
+    source.y = src_rect->y;
+    source.w = src_rect->w;
+    source.h = src_rect->h;
   }
-
-  if (dst_rect) {
-    dst.x = dst_rect->x;
-    dst.y = dst_rect->y;
-    dst.w = dst_rect->w;
-    dst.h = dst_rect->h;
+  SDL_FRect target = {dst_rect.x, dst_rect.y, dst_rect.w, dst_rect.h};
+  double angle = 0.0;
+  SDL_RendererFlip flip = SDL_FLIP_NONE;
+  Uint8 alpha = 255;
+  Uint8 r = 255, g = 255, b = 255;
+  if (options) {
+    angle = options->angle;
+    if (options->flip) flip = SDL_FLIP_HORIZONTAL;
+    if (options->alpha > 0.0f)
+      alpha = (Uint8)(clampf(options->alpha, 0.0f, 1.0f) * 255.0f);
+    if (options->tinted) {
+      r = options->r;
+      g = options->g;
+      b = options->b;
+    }
   }
-
-  SDL_RenderCopy(graphics_context->renderer, tex->texture, &src, &dst);
-}
-
-void render_sprite_scaled(const graphics_context_ptr graphics_context,
-                          const texture_ptr tex, const rect_t* src_rect, int x,
-                          int y, int scale) {
-  if (!graphics_context || !tex || !tex->texture || scale <= 0) {
-    return;
-  }
-
-  SDL_Rect src = {0, 0, tex->width, tex->height};
-  if (src_rect) {
-    src.x = src_rect->x;
-    src.y = src_rect->y;
-    src.w = src_rect->w;
-    src.h = src_rect->h;
-  }
-
-  SDL_Rect dst = {x, y, src.w * scale, src.h * scale};
-
-  SDL_RenderCopy(graphics_context->renderer, tex->texture, &src, &dst);
-}
-
-void render_sprite_scaled_alpha(const graphics_context_ptr graphics_context,
-                                const texture_ptr tex, const rect_t* src_rect,
-                                int x, int y, int scale, int alpha) {
-  if (!graphics_context || !tex || !tex->texture || scale <= 0) {
-    return;
-  }
-
-  // Save current alpha mod
-  Uint8 current_alpha;
-  SDL_GetTextureAlphaMod(tex->texture, &current_alpha);
-
-  // Set desired alpha (clamp to 0-255 range)
-  Uint8 target_alpha = (alpha < 0) ? 0 : ((alpha > 255) ? 255 : (Uint8)alpha);
-  SDL_SetTextureAlphaMod(tex->texture, target_alpha);
-
-  SDL_Rect src = {0, 0, tex->width, tex->height};
-  if (src_rect) {
-    src.x = src_rect->x;
-    src.y = src_rect->y;
-    src.w = src_rect->w;
-    src.h = src_rect->h;
-  }
-
-  SDL_Rect dst = {x, y, src.w * scale, src.h * scale};
-
-  SDL_RenderCopy(graphics_context->renderer, tex->texture, &src, &dst);
-
-  // Restore original alpha mod
-  SDL_SetTextureAlphaMod(tex->texture, current_alpha);
-}
-
-void render_sprite_flipped(const graphics_context_ptr graphics_context,
-                           const texture_ptr tex, const rect_t* src_rect,
-                           const rect_t* dst_rect, flip_t flip) {
-  if (!graphics_context || !tex || !tex->texture) {
-    return;
-  }
-
-  SDL_Rect src = {0, 0, tex->width, tex->height};
-  SDL_Rect dst = {0, 0, tex->width, tex->height};
-
-  if (src_rect) {
-    src.x = src_rect->x;
-    src.y = src_rect->y;
-    src.w = src_rect->w;
-    src.h = src_rect->h;
-  }
-
-  if (dst_rect) {
-    dst.x = dst_rect->x;
-    dst.y = dst_rect->y;
-    dst.w = dst_rect->w;
-    dst.h = dst_rect->h;
-  }
-
-  SDL_RendererFlip sdl_flip = SDL_FLIP_NONE;
-  if (flip & FLIP_HORIZONTAL) {
-    sdl_flip |= SDL_FLIP_HORIZONTAL;
-  }
-  if (flip & FLIP_VERTICAL) {
-    sdl_flip |= SDL_FLIP_VERTICAL;
-  }
-
-  SDL_RenderCopyEx(graphics_context->renderer, tex->texture, &src, &dst, 0.0,
-                   NULL, sdl_flip);
-}
-
-void render_sprite_rotated(const graphics_context_ptr graphics_context,
-                           const texture_ptr tex, const rect_t* src_rect,
-                           const rect_t* dst_rect, double angle, flip_t flip) {
-  if (!graphics_context || !tex || !tex->texture) {
-    return;
-  }
-
-  SDL_Rect src = {0, 0, tex->width, tex->height};
-  SDL_Rect dst = {0, 0, tex->width, tex->height};
-
-  if (src_rect) {
-    src.x = src_rect->x;
-    src.y = src_rect->y;
-    src.w = src_rect->w;
-    src.h = src_rect->h;
-  }
-
-  if (dst_rect) {
-    dst.x = dst_rect->x;
-    dst.y = dst_rect->y;
-    dst.w = dst_rect->w;
-    dst.h = dst_rect->h;
-  }
-
-  SDL_RendererFlip sdl_flip = SDL_FLIP_NONE;
-  if (flip & FLIP_HORIZONTAL) {
-    sdl_flip |= SDL_FLIP_HORIZONTAL;
-  }
-  if (flip & FLIP_VERTICAL) {
-    sdl_flip |= SDL_FLIP_VERTICAL;
-  }
-
-  SDL_RenderCopyEx(graphics_context->renderer, tex->texture, &src, &dst, angle,
-                   NULL, sdl_flip);
+  SDL_SetTextureAlphaMod(tex->texture, alpha);
+  SDL_SetTextureColorMod(tex->texture, r, g, b);
+  SDL_RenderCopyExF(graphics_context->renderer, tex->texture,
+                    src_rect ? &source : NULL, &target, angle, NULL, flip);
 }
 
 rect_t make_rect(int x, int y, int w, int h) {
@@ -253,40 +157,4 @@ rect_t make_rect(int x, int y, int w, int h) {
 frect_t make_frect(float x, float y, float w, float h) {
   frect_t rect = {x, y, w, h};
   return rect;
-}
-
-void render_sprite_f(const graphics_context_ptr graphics_context,
-                     const texture_ptr tex, const rect_t* src_rect,
-                     const frect_t* dst_rect) {
-  if (!graphics_context || !tex || !tex->texture) {
-    return;
-  }
-
-  SDL_Rect src = {0, 0, tex->width, tex->height};
-  SDL_FRect dst = {0.0f, 0.0f, (float)tex->width, (float)tex->height};
-
-  if (src_rect) {
-    src.x = src_rect->x;
-    src.y = src_rect->y;
-    src.w = src_rect->w;
-    src.h = src_rect->h;
-  }
-
-  if (dst_rect) {
-    dst.x = dst_rect->x;
-    dst.y = dst_rect->y;
-    dst.w = dst_rect->w;
-    dst.h = dst_rect->h;
-  }
-
-  // Use SDL_RenderCopyF for sub-pixel precision rendering (smoother movement)
-  SDL_RenderCopyF(graphics_context->renderer, tex->texture, &src, &dst);
-}
-
-void set_logical_size(const graphics_context_ptr graphics_context, int width,
-                      int height) {
-  if (!graphics_context) {
-    return;
-  }
-  SDL_RenderSetLogicalSize(graphics_context->renderer, width, height);
 }

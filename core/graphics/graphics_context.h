@@ -12,6 +12,7 @@
 
 #include <SDL.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "geometry.h"
 #include "window_mode.h"
@@ -20,9 +21,12 @@
 typedef struct graphics_context {
   SDL_Window* window;
   SDL_Renderer* renderer;
-  int screen_width;
+  int screen_width;  /**< window size when it was created */
   int screen_height;
   point_t screen_center;
+  float view_height;  /**< logical height of the view; 0 means pixels */
+  float view_scale;   /**< pixels per logical unit, set by begin_frame */
+  float view_width;   /**< logical width, set by begin_frame */
 } graphics_context_t;
 
 typedef graphics_context_t* graphics_context_ptr;
@@ -43,19 +47,28 @@ bool initialize_graphics_subsystems(void);
 bool validate_display_configuration(int* display, int* display_mode,
                                     SDL_DisplayMode* sdl_display_mode);
 
+/** What a game asks of its window. */
+typedef struct {
+  const char* title;
+  int width;   /**< 0 for the whole usable screen (windowed) or the display */
+  int height;  /**< mode's size (other modes) */
+  int display;
+  int display_mode;
+  window_mode_t window_mode;
+  bool vsync;
+  float view_height;  /**< logical height the game draws in; 0 for pixels */
+} graphics_config_t;
+
+/** A resizable window filling the screen, vsynced, drawn in pixels. */
+graphics_config_t default_graphics_config(const char* title);
+
 /**
  * @brief Create game window with specified configuration
- * @param title Window title
- * @param window_mode Window display mode
- * @param display Display index
- * @param width Window width
- * @param height Window height
+ * @param config Title, size and mode
  * @param display_mode SDL display mode for fullscreen
  * @return Created window or NULL on failure
  */
-SDL_Window* create_application_window(const char* title,
-                                      window_mode_t window_mode, int display,
-                                      int width, int height,
+SDL_Window* create_application_window(const graphics_config_t* config,
                                       SDL_DisplayMode* display_mode);
 
 /**
@@ -68,15 +81,22 @@ SDL_Renderer* create_application_renderer(SDL_Window* window, bool vsync);
 
 /**
  * @brief Initialize complete graphics context
- * @param display Display index
- * @param display_mode Display mode index
- * @param window_mode Window mode configuration
- * @param vsync Enable vertical synchronization
- * @return Initialized graphics context
+ * @return Initialized graphics context; window and renderer are NULL on
+ *         failure
  */
-graphics_context_t initialize_graphics_context(int display, int display_mode,
-                                               window_mode_t window_mode,
-                                               bool vsync);
+graphics_context_t initialize_graphics_context(
+    const graphics_config_t* config);
+
+/**
+ * @brief Start a frame: fit the view to the window, then clear it
+ *
+ * Sets view_scale and view_width from the window's current output size, so
+ * everything drawn afterwards is in logical units.
+ */
+void begin_frame(graphics_context_t* context, uint8_t r, uint8_t g, uint8_t b);
+
+/** Saves what the renderer has drawn this frame as a BMP file. */
+bool save_frame_bmp(const graphics_context_t* context, const char* path);
 
 /**
  * @brief Cleanup and shutdown graphics context

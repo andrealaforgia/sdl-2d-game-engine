@@ -119,8 +119,8 @@ void init_circle_lookup(void);
  * @param height Rectangle height
  * @param color Fill color
  */
-void draw_filled_rect(const graphics_context_ptr graphics_context,
-                      int x, int y, int width, int height, color_t color);
+void draw_filled_rect(const graphics_context_ptr graphics_context, float x,
+                      float y, float width, float height, color_t color);
 
 /**
  * @brief Draw a filled rectangle with alpha blending
@@ -133,7 +133,7 @@ void draw_filled_rect(const graphics_context_ptr graphics_context,
  * @param alpha Alpha value (0-255, where 255 is opaque)
  */
 void draw_filled_rect_alpha(const graphics_context_ptr graphics_context,
-                            int x, int y, int width, int height,
+                            float x, float y, float width, float height,
                             color_t color, uint8_t alpha);
 
 /**

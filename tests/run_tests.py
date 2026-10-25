@@ -84,6 +84,14 @@ def main():
     args = parser.parse_args()
     sources = [
         ROOT / "core/utils/command_line.c",
+        ROOT / "core/graphics/viewport.c",
+        ROOT / "core/graphics/pixel_font.c",
+        ROOT / "core/graphics/font5x7.c",
+        ROOT / "core/graphics/graphics_context.c",
+        ROOT / "core/graphics/texture.c",
+        ROOT / "core/graphics/drawing_primitives.c",
+        ROOT / "core/graphics/color.c",
+        ROOT / "core/graphics/display_manager.c",
         ROOT / "core/audio/mixer.c",
         ROOT / "core/audio/audio.c",
         ROOT / "core/input/controls.c",
@@ -99,7 +107,7 @@ def main():
         ROOT / ("tests/" + name)
         for name in ("test_allocator.c", "test_clock.c", "test_engine.c")
     ]
-    cases = [(name, [name], 0) for name in ("mixer", "sounds", "music", "wav", "controls", "keys", "pool", "allocation", "events", "rng", "random-geometry", "scalars", "rectangles", "stepper", "clock")]
+    cases = [(name, [name], 0) for name in ("viewport", "pixel-text", "headless-graphics", "mixer", "sounds", "music", "wav", "controls", "keys", "pool", "allocation", "events", "rng", "random-geometry", "scalars", "rectangles", "stepper", "clock")]
     cases += [
         ("valid options", ["parse", "--fps=120", "--volume=64", "--window-mode=0"], 0)
     ]

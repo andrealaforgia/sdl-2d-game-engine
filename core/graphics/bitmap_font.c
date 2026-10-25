@@ -142,8 +142,10 @@ void render_bitmap_text_scaled(const bitmap_font_ptr font,
       rect_t src_rect = make_rect(char_x, char_y + color_y_offset,
                                   font->char_width, font->char_height);
 
-      render_sprite_scaled(graphics_context, &font->texture, &src_rect,
-                           cursor_x, y, scale);
+      frect_t target = make_frect((float)cursor_x, (float)y,
+                                  (float)(font->char_width * scale),
+                                  (float)(font->char_height * scale));
+      render_sprite(graphics_context, &font->texture, &src_rect, target, NULL);
     }
 
     cursor_x += scaled_char_width;
@@ -177,8 +179,13 @@ void render_bitmap_text_scaled_alpha(
       rect_t src_rect = make_rect(char_x, char_y + color_y_offset,
                                   font->char_width, font->char_height);
 
-      render_sprite_scaled_alpha(graphics_context, &font->texture, &src_rect,
-                                 cursor_x, y, scale, alpha);
+      frect_t target = make_frect((float)cursor_x, (float)y,
+                                  (float)(font->char_width * scale),
+                                  (float)(font->char_height * scale));
+      draw_options_t options = {false, (float)alpha / 255.0f, 0.0f, false, 0, 0, 0};
+      if (alpha > 0)
+        render_sprite(graphics_context, &font->texture, &src_rect, target,
+                      &options);
     }
 
     cursor_x += scaled_char_width;
