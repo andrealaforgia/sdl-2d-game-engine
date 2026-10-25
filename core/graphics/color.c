@@ -9,7 +9,7 @@
 
 #include "inline.h"
 
-ALWAYS_INLINE color_t random_color(void) {
+ALWAYS_INLINE color_t random_color(rng_t* rng) {
   // Generate vibrant colors by using predefined bright color palette
   color_t colors[] = {
       0xFF0000,  // Red
@@ -24,5 +24,5 @@ ALWAYS_INLINE color_t random_color(void) {
       0x0080FF,  // Sky blue
   };
   size_t color_count = sizeof(colors) / sizeof(color_t);
-  return colors[rand() % color_count];
+  return colors[rng_range(rng, 0, (int)color_count - 1)];
 }

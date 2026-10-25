@@ -11,6 +11,7 @@
 #define CORE_GRAPHICS_COLOR_H_
 
 #include "inline.h"
+#include "rng.h"
 
 #define COLOR_BLACK 0x000000
 #define COLOR_WHITE 0xFFFFFF
@@ -35,6 +36,6 @@ typedef int color_t;
  * @brief Generate a random vibrant color from predefined palette
  * @return Random color value from bright color palette
  */
-color_t random_color(void);
+color_t random_color(rng_t* rng);
 
 #endif  // CORE_GRAPHICS_COLOR_H_
