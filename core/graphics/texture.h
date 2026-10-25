@@ -23,11 +23,6 @@ typedef struct {
   int x, y, w, h;
 } rect_t;
 
-// Float rectangle structure for sub-pixel precision rendering
-typedef struct {
-  float x, y, w, h;
-} frect_t;
-
 // Flip flags for sprite rendering
 typedef enum { FLIP_NONE = 0, FLIP_HORIZONTAL = 1, FLIP_VERTICAL = 2 } flip_t;
 

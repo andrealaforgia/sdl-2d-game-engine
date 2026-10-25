@@ -21,8 +21,9 @@ ALWAYS_INLINE double wrap(double value, double upper_bound) {
 }
 
 ALWAYS_INLINE point_t
-random_screen_point(const graphics_context_ptr graphics_context) {
-  return random_point(graphics_context->screen_width,
+random_screen_point(rng_t* rng,
+                    const graphics_context_ptr graphics_context) {
+  return random_point(rng, graphics_context->screen_width,
                       graphics_context->screen_height);
 }
 

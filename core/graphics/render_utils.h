@@ -24,7 +24,8 @@
  * @param graphics_context Graphics context containing screen dimensions
  * @return Random point within screen bounds
  */
-point_t random_screen_point(const graphics_context_ptr graphics_context);
+point_t random_screen_point(rng_t* rng,
+                            const graphics_context_ptr graphics_context);
 
 /**
  * @brief Wrap X coordinate within screen bounds using toroidal wrapping

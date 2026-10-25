@@ -18,6 +18,6 @@ typedef struct {
 } velocity_t, *velocity_ptr;
 
 velocity_t velocity(const double speed, const vector_t direction);
-velocity_t random_velocity(void);
+velocity_t random_velocity(rng_t* rng);
 
 #endif  // CORE_MATH_PHYSICS_H_
