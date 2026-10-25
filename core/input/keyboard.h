@@ -13,7 +13,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define MAX_KEYS_PER_BUTTON 3
+#define MAX_KEYS_PER_BUTTON 4
 
 typedef struct {
   uint32_t button;                       /**< the button bit this drives */
