@@ -1,55 +1,30 @@
 /**
  * @file keyboard.h
- * @brief Keyboard input handling with debouncing
+ * @brief Maps keys to the buttons of a controls_t
  *
- * Provides functions for detecting keyboard input with built-in
- * debouncing to prevent accidental double-presses. Maintains timing
- * state for each monitored key to ensure clean input detection.
+ * A game lists its bindings once: which scancodes drive which button. A key
+ * may appear under several buttons (up can be both "up" and "jump").
  */
 
 #ifndef CORE_INPUT_KEYBOARD_H_
 #define CORE_INPUT_KEYBOARD_H_
 
 #include <SDL.h>
-#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
-#include "clock.h"
+#define MAX_KEYS_PER_BUTTON 3
 
 typedef struct {
-  const Uint8* keys;
-  bool s_key_was_down;
-  bool f11_key_was_down;
-  int space_key_last_ticks;
-  int up_key_last_ticks;
-  int left_key_last_ticks;
-  int right_key_last_ticks;
-  int down_key_last_ticks;
-  int s_key_last_ticks;
-  int p_key_last_ticks;
-  int f11_key_last_ticks;
-  int return_key_last_ticks;
-} keyboard_state_t, *keyboard_state_ptr;
+  uint32_t button;                       /**< the button bit this drives */
+  int scancodes[MAX_KEYS_PER_BUTTON];    /**< SDL scancodes; 0 ends the list */
+} key_binding_t;
 
-keyboard_state_t init_keyboard_state(void);
-void update_keyboard_state(keyboard_state_ptr keyboard_state);
-void print_keyboard_state(keyboard_state_ptr keyboard_state);
-bool is_space_key_pressed(const keyboard_state_ptr keyboard_state);
-bool is_up_key_pressed(const keyboard_state_ptr keyboard_state);
-bool is_left_key_pressed(const keyboard_state_ptr keyboard_state);
-bool is_right_key_pressed(const keyboard_state_ptr keyboard_state);
-bool is_down_key_pressed(const keyboard_state_ptr keyboard_state);
-bool is_esc_key_pressed(const keyboard_state_ptr keyboard_state);
+/** The buttons down according to `keys` (an SDL keyboard state array). */
+uint32_t keyboard_buttons(const Uint8* keys, const key_binding_t* bindings,
+                          size_t count);
 
-/* Non-debounced "held" variants for continuous input (e.g., movement) */
-bool is_left_key_held(const keyboard_state_ptr keyboard_state);
-bool is_right_key_held(const keyboard_state_ptr keyboard_state);
-bool is_up_key_held(const keyboard_state_ptr keyboard_state);
-bool is_down_key_held(const keyboard_state_ptr keyboard_state);
-bool is_y_key_pressed(const keyboard_state_ptr keyboard_state);
-bool is_n_key_pressed(const keyboard_state_ptr keyboard_state);
-bool is_s_key_pressed(const keyboard_state_ptr keyboard_state);
-bool is_p_key_pressed(const keyboard_state_ptr keyboard_state);
-bool is_return_key_pressed(const keyboard_state_ptr keyboard_state);
-bool is_f11_key_pressed(const keyboard_state_ptr keyboard_state);
+/** The buttons down right now, read from SDL's keyboard state. */
+uint32_t keyboard_read(const key_binding_t* bindings, size_t count);
 
 #endif  // CORE_INPUT_KEYBOARD_H_

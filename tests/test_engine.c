@@ -11,27 +11,46 @@
 #include "physics.h"
 #include "rng.h"
 #include "stepper.h"
+#include "controls.h"
 #include "keyboard.h"
 #include "object_pool.h"
 #include "test_allocator.h"
 extern int test_ticks;
-static void toggle_keys_fire_once_per_press(void) {
+enum { BTN_LEFT = 1u << 0, BTN_JUMP = 1u << 1, BTN_FIRE = 1u << 2 };
+
+static void controls_report_edges_once(void) {
+  controls_t controls = {0};
+  controls_update(&controls, BTN_JUMP);
+  assert(controls_held(&controls, BTN_JUMP));
+  assert(controls_pressed(&controls, BTN_JUMP));
+  controls_update(&controls, BTN_JUMP);
+  assert(controls_held(&controls, BTN_JUMP));
+  assert(!controls_pressed(&controls, BTN_JUMP));
+  controls_update(&controls, 0);
+  assert(!controls_held(&controls, BTN_JUMP));
+  assert(!controls_pressed(&controls, BTN_JUMP));
+  controls_update(&controls, BTN_JUMP | BTN_LEFT);
+  assert(controls_pressed(&controls, BTN_JUMP));
+  assert(controls_pressed(&controls, BTN_LEFT));
+  controls_consume_presses(&controls);
+  assert(!controls_pressed(&controls, BTN_JUMP));
+  assert(controls_held(&controls, BTN_JUMP));
+}
+static void keys_map_to_buttons_and_may_share_a_key(void) {
+  static const key_binding_t bindings[] = {
+      {BTN_LEFT, {SDL_SCANCODE_LEFT, SDL_SCANCODE_A, 0}},
+      {BTN_JUMP, {SDL_SCANCODE_SPACE, SDL_SCANCODE_Z, SDL_SCANCODE_UP}},
+      {BTN_FIRE, {SDL_SCANCODE_J, 0, 0}},
+  };
   Uint8 keys[SDL_NUM_SCANCODES] = {0};
-  keyboard_state_t keyboard = init_keyboard_state();
-  keyboard.keys = keys;
-  keys[SDL_SCANCODE_S] = 1;
-  test_ticks += 1000;
-  assert(is_s_key_pressed(&keyboard));
-  test_ticks += 1000;
-  assert(!is_s_key_pressed(&keyboard));
-  keys[SDL_SCANCODE_S] = 0;
-  assert(!is_s_key_pressed(&keyboard));
-  keys[SDL_SCANCODE_S] = 1;
-  assert(is_s_key_pressed(&keyboard));
-  keys[SDL_SCANCODE_F11] = 1;
-  assert(is_f11_key_pressed(&keyboard));
-  test_ticks += 1000;
-  assert(!is_f11_key_pressed(&keyboard));
+  assert(keyboard_buttons(keys, bindings, 3) == 0);
+  keys[SDL_SCANCODE_A] = 1;
+  assert(keyboard_buttons(keys, bindings, 3) == BTN_LEFT);
+  keys[SDL_SCANCODE_UP] = 1;
+  assert(keyboard_buttons(keys, bindings, 3) == (BTN_LEFT | BTN_JUMP));
+  keys[SDL_SCANCODE_J] = 1;
+  assert(keyboard_buttons(keys, bindings, 3) ==
+         (BTN_LEFT | BTN_JUMP | BTN_FIRE));
 }
 static void pools_release_storage_and_reuse_slots(void) {
   object_pool_t pool = create_object_pool(sizeof(int), 2);
@@ -165,8 +184,10 @@ int main(int argc, char** argv) {
         parse_command_line_options(argc - 1, argv + 1);
     printf("fps=%d volume=%d mode=%d\n", options.fps, options.volume,
            options.window_mode);
+  } else if (!strcmp(argv[1], "controls")) {
+    controls_report_edges_once();
   } else if (!strcmp(argv[1], "keys")) {
-    toggle_keys_fire_once_per_press();
+    keys_map_to_buttons_and_may_share_a_key();
   } else if (!strcmp(argv[1], "pool")) {
     pools_release_storage_and_reuse_slots();
   } else if (!strcmp(argv[1], "allocation")) {
