@@ -1,24 +1,30 @@
 .DEFAULT_GOAL := all
 
+# TrueType text (SDL2_ttf) is optional: `make WITH_TTF=0` builds without it.
+WITH_TTF ?= 1
+
 CC = gcc
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S), Linux)
     PLATFORM = LINUX
-    INSTALL_CMD = sudo apt-get update && sudo apt-get install -y libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev
-    DEV_INSTALL_CMD = sudo apt-get update && sudo apt-get install -y cpplint clang-format libsdl2-ttf-dev
+    INSTALL_CMD = sudo apt-get update && sudo apt-get install -y libsdl2-dev libsdl2-image-dev $(if $(filter 1,$(WITH_TTF)),libsdl2-ttf-dev)
+    DEV_INSTALL_CMD = sudo apt-get update && sudo apt-get install -y cpplint clang-format $(if $(filter 1,$(WITH_TTF)),libsdl2-ttf-dev)
     AR = ar
 else ifeq ($(UNAME_S), Darwin)
     PLATFORM = OSX
-    INSTALL_CMD = brew install sdl2 sdl2_image sdl2_mixer sdl2_ttf
-    DEV_INSTALL_CMD = brew install cpplint clang-format sdl2_ttf
+    INSTALL_CMD = brew install sdl2 sdl2_image $(if $(filter 1,$(WITH_TTF)),sdl2_ttf)
+    DEV_INSTALL_CMD = brew install cpplint clang-format $(if $(filter 1,$(WITH_TTF)),sdl2_ttf)
     AR = ar
 else
     $(error Unsupported platform)
 endif
 
 SDL2_CFLAGS := $(shell sdl2-config --cflags)
-SDL2_LFLAGS := $(shell sdl2-config --libs) -lSDL2_image -lSDL2_mixer -lSDL2_ttf
+SDL2_LFLAGS := $(shell sdl2-config --libs) -lSDL2_image
+ifeq ($(WITH_TTF),1)
+    SDL2_LFLAGS += -lSDL2_ttf
+endif
 
 SRCDIR = .
 CORE_GRAPHICS_DIR = core/graphics
@@ -35,6 +41,11 @@ SRC = $(wildcard $(CORE_GRAPHICS_DIR)/*.c) $(wildcard $(CORE_MATH_DIR)/*.c) $(wi
 
 HEADERS = $(wildcard $(SRCDIR)/*.h) \
           $(wildcard $(CORE_GRAPHICS_DIR)/*.h) $(wildcard $(CORE_MATH_DIR)/*.h) $(wildcard $(CORE_INPUT_DIR)/*.h) $(wildcard $(CORE_AUDIO_DIR)/*.h) $(wildcard $(CORE_TIME_DIR)/*.h) $(wildcard $(CORE_UTILS_DIR)/*.h) $(wildcard $(CORE_MEMORY_DIR)/*.h) $(wildcard $(CORE_EVENTS_DIR)/*.h)
+
+ifneq ($(WITH_TTF),1)
+    SRC := $(filter-out $(CORE_GRAPHICS_DIR)/ttf_text.c,$(SRC))
+    HEADERS := $(filter-out $(CORE_GRAPHICS_DIR)/ttf_text.h,$(HEADERS))
+endif
 
 OBJ = $(SRC:.c=.o)
 DEP = $(OBJ:.o=.d)

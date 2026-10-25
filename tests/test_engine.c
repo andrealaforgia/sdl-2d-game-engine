@@ -2,6 +2,7 @@
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "clock.h"
@@ -11,6 +12,7 @@
 #include "physics.h"
 #include "rng.h"
 #include "stepper.h"
+#include "audio.h"
 #include "controls.h"
 #include "keyboard.h"
 #include "object_pool.h"
@@ -199,6 +201,129 @@ static void games_can_register_their_own_options(int argc, char** argv) {
   assert(seconds > 2.4f && seconds < 2.6f);
   assert(snapshot && !strcmp(snapshot, "out.bmp"));
 }
+static void the_mixer_plays_a_sample_once_then_stops(void) {
+  int16_t data[100];
+  for (int i = 0; i < 100; ++i) data[i] = 1000;
+  sample_t sample = {data, 100};
+  mixer_t mixer;
+  mixer_init(&mixer);
+  mixer_play(&mixer, &sample, 1.0f);
+  assert(mixer_active_voices(&mixer) == 1);
+  int16_t out[60] = {0};
+  mixer_render(&mixer, out, 60);
+  assert(out[0] == 1000 && out[59] == 1000);
+  mixer_render(&mixer, out, 60);
+  assert(mixer_active_voices(&mixer) == 0);
+}
+static void the_mixer_saturates_instead_of_wrapping_and_steals_voices(void) {
+  int16_t loud[4] = {30000, 30000, 30000, 30000};
+  sample_t sample = {loud, 4};
+  mixer_t mixer;
+  mixer_init(&mixer);
+  mixer_play(&mixer, &sample, 1.0f);
+  mixer_play(&mixer, &sample, 1.0f);
+  int16_t out[4] = {0};
+  mixer_render(&mixer, out, 4);
+  assert(out[0] == 32767);
+  mixer_init(&mixer);
+  for (int i = 0; i < MIXER_VOICES + 3; ++i) mixer_play(&mixer, &sample, 1.0f);
+  assert(mixer_active_voices(&mixer) == MIXER_VOICES);
+}
+static void a_sound_context_copies_mixes_and_mutes_samples(void) {
+  setenv("SDL_AUDIODRIVER", "dummy", 1);
+  audio_context_ptr audio = init_audio_context(2, 128);
+  assert(audio);
+  int16_t data[8] = {1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000};
+  assert(set_sound(audio, 0, data, 8));
+  data[0] = 0;  // the context holds its own copy
+  assert(!set_sound(audio, 5, data, 8));
+  int16_t out[8] = {0};
+  play_sound(audio, 0);
+  audio_render(audio, out, 8);
+  assert(out[0] == 1000);
+  set_sound_enabled(audio, false);
+  play_sound(audio, 0);
+  int16_t silent[8] = {0};
+  audio_render(audio, silent, 8);
+  assert(silent[0] == 0);
+  set_sound_enabled(audio, true);
+  play_sound_at_volume(audio, 0, 0.5f);
+  int16_t half[8] = {0};
+  audio_render(audio, half, 8);
+  assert(half[0] == 500);
+  set_audio_volume(audio, 64);
+  play_sound(audio, 0);
+  int16_t quiet[8] = {0};
+  audio_render(audio, quiet, 8);
+  assert(quiet[0] == 500);
+  terminate_audio_context(audio);
+}
+static void music_fill(void* user, int16_t* out, int frames, float gain) {
+  int* calls = user;
+  ++*calls;
+  for (int i = 0; i < frames; ++i) out[i] = (int16_t)(1000 * gain);
+}
+static void a_music_source_is_mixed_with_a_gain_and_can_be_switched_off(void) {
+  setenv("SDL_AUDIODRIVER", "dummy", 1);
+  audio_context_ptr audio = init_audio_context(1, 128);
+  assert(audio);
+  int calls = 0;
+  set_music_source(audio, music_fill, &calls);
+  set_music_gain(audio, 0.5f);
+  int16_t out[4] = {0};
+  audio_render(audio, out, 4);
+  assert(calls == 1 && out[0] == 500);
+  set_music_enabled(audio, false);
+  int16_t silent[4] = {0};
+  audio_render(audio, silent, 4);
+  assert(silent[0] == 0);
+  terminate_audio_context(audio);
+}
+static void write_wav(const char* path, int channels, int rate, int frames) {
+  FILE* file = fopen(path, "wb");
+  assert(file);
+  uint32_t data_bytes = (uint32_t)(frames * channels * 2);
+  uint32_t riff = 36 + data_bytes, fmt = 16, byte_rate = rate * channels * 2;
+  uint16_t pcm = 1, ch = (uint16_t)channels, align = (uint16_t)(channels * 2),
+           bits = 16;
+  uint32_t sample_rate = (uint32_t)rate;
+  fwrite("RIFF", 1, 4, file);
+  fwrite(&riff, 4, 1, file);
+  fwrite("WAVEfmt ", 1, 8, file);
+  fwrite(&fmt, 4, 1, file);
+  fwrite(&pcm, 2, 1, file);
+  fwrite(&ch, 2, 1, file);
+  fwrite(&sample_rate, 4, 1, file);
+  fwrite(&byte_rate, 4, 1, file);
+  fwrite(&align, 2, 1, file);
+  fwrite(&bits, 2, 1, file);
+  fwrite("data", 1, 4, file);
+  fwrite(&data_bytes, 4, 1, file);
+  for (int i = 0; i < frames * channels; ++i) {
+    int16_t value = 2000;
+    fwrite(&value, 2, 1, file);
+  }
+  fclose(file);
+}
+static void wav_files_are_converted_to_the_mixer_format(void) {
+  setenv("SDL_AUDIODRIVER", "dummy", 1);
+  audio_context_ptr audio = init_audio_context(2, 128);
+  assert(audio);
+  const char* directory = getenv("TMPDIR") ? getenv("TMPDIR") : "/tmp";
+  char mono[512], stereo[512];
+  snprintf(mono, sizeof(mono), "%s/engine-test-mono.wav", directory);
+  snprintf(stereo, sizeof(stereo), "%s/engine-test-stereo.wav", directory);
+  write_wav(mono, 1, MIXER_RATE, 100);
+  write_wav(stereo, 2, MIXER_RATE * 2, 400);
+  assert(load_sound(audio, 0, directory, "engine-test-mono.wav"));
+  assert(load_sound(audio, 1, directory, "engine-test-stereo.wav"));
+  assert(!load_sound(audio, 0, directory, "does-not-exist.wav"));
+  assert(sound_length(audio, 0) == 100);
+  assert(sound_length(audio, 1) == 200);
+  remove(mono);
+  remove(stereo);
+  terminate_audio_context(audio);
+}
 int main(int argc, char** argv) {
   assert(argc >= 2);
   if (!strcmp(argv[1], "parse")) {
@@ -206,6 +331,15 @@ int main(int argc, char** argv) {
     parse_command_line_options(argc - 1, argv + 1, &options, NULL, 0);
     printf("fps=%d volume=%d mode=%d\n", options.fps, options.volume,
            options.window_mode);
+  } else if (!strcmp(argv[1], "mixer")) {
+    the_mixer_plays_a_sample_once_then_stops();
+    the_mixer_saturates_instead_of_wrapping_and_steals_voices();
+  } else if (!strcmp(argv[1], "sounds")) {
+    a_sound_context_copies_mixes_and_mutes_samples();
+  } else if (!strcmp(argv[1], "music")) {
+    a_music_source_is_mixed_with_a_gain_and_can_be_switched_off();
+  } else if (!strcmp(argv[1], "wav")) {
+    wav_files_are_converted_to_the_mixer_format();
   } else if (!strcmp(argv[1], "custom")) {
     games_can_register_their_own_options(argc - 1, argv + 1);
   } else if (!strcmp(argv[1], "controls")) {

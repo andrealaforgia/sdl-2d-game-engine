@@ -57,7 +57,7 @@ def build(sources, destination, sanitize=False, extra_includes=()):
         + flags
         + objects
         + sdl_libs
-        + ["-lSDL2_image", "-lSDL2_mixer", "-lSDL2_ttf", "-lm", "-o", str(destination)],
+        + ["-lSDL2_image", "-lSDL2_ttf", "-lm", "-o", str(destination)],
         check=True,
     )
 
@@ -84,6 +84,8 @@ def main():
     args = parser.parse_args()
     sources = [
         ROOT / "core/utils/command_line.c",
+        ROOT / "core/audio/mixer.c",
+        ROOT / "core/audio/audio.c",
         ROOT / "core/input/controls.c",
         ROOT / "core/input/keyboard.c",
         ROOT / "core/input/events.c",
@@ -97,7 +99,7 @@ def main():
         ROOT / ("tests/" + name)
         for name in ("test_allocator.c", "test_clock.c", "test_engine.c")
     ]
-    cases = [(name, [name], 0) for name in ("controls", "keys", "pool", "allocation", "events", "rng", "random-geometry", "scalars", "rectangles", "stepper", "clock")]
+    cases = [(name, [name], 0) for name in ("mixer", "sounds", "music", "wav", "controls", "keys", "pool", "allocation", "events", "rng", "random-geometry", "scalars", "rectangles", "stepper", "clock")]
     cases += [
         ("valid options", ["parse", "--fps=120", "--volume=64", "--window-mode=0"], 0)
     ]
