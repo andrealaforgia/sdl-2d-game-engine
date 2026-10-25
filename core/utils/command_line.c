@@ -17,22 +17,40 @@
 #define FPS "--fps="
 #define VOLUME "--volume="
 
-void print_help(const custom_option_t* custom, size_t custom_count) {
+static const char* window_mode_name(window_mode_t mode) {
+  switch (mode) {
+    case WINDOWED:
+      return "windowed";
+    case FULLSCREEN:
+      return "fullscreen";
+    case BORDERLESS:
+      return "borderless";
+    default:
+      return "maximized";
+  }
+}
+
+void print_help(const command_line_options_t* defaults,
+                const custom_option_t* custom, size_t custom_count) {
   puts("\noptions:");
   puts("\t" HELP ": print this help");
   puts("\t" GRAPHICS_INFO ": print info about the graphics system");
-  puts("\t" VSYNC ": enable VSync for smoother rendering (default: off)");
-  puts("\t" VOLUME
-       "X: set audio volume 0-128 (default: 32, 0=silent, 128=max)");
+  printf("\t" VSYNC ": enable VSync for smoother rendering (default: %s)\n",
+         defaults->vsync ? "on" : "off");
+  printf("\t" VOLUME "X: set audio volume 0-128 (default: %d, 0=silent)\n",
+         defaults->volume);
   puts("\t" SHOW_FPS ": show frames-per-second stats during game");
-  puts("\t" FPS "X: set target frame rate 1-300 (default: 60)");
+  printf("\t" FPS "X: set target frame rate 1-300 (default: %d)\n",
+         defaults->fps);
   puts("\t" DISPLAY "X : use display X (default is 0: use " GRAPHICS_INFO
        " to show the number of available displays");
   puts("\t" DISPLAY_MODE
        "X: use display mode X (default is 0: use " GRAPHICS_INFO
        " to show all available display modes)");
-  puts("\t" WINDOW_MODE
-       "N: window mode (0=windowed, 1=fullscreen, 2=borderless, 3=maximized)");
+  printf("\t" WINDOW_MODE
+         "N: window mode (0=windowed, 1=fullscreen, 2=borderless, "
+         "3=maximized; default: %s)\n",
+         window_mode_name(defaults->window_mode));
   for (size_t i = 0; i < custom_count; ++i) {
     const char* value = custom[i].kind == OPTION_FLAG ? "" : "=X";
     printf("\t--%s%s: %s\n", custom[i].name, value, custom[i].help);

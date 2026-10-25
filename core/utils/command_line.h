@@ -58,6 +58,9 @@ void parse_command_line_options(int argc, char* argv[],
                                 const custom_option_t* custom,
                                 size_t custom_count);
 
-void print_help(const custom_option_t* custom, size_t custom_count);
+/** Prints the options, showing `defaults` (what a game starts from) and the
+ * game's own `custom` options. */
+void print_help(const command_line_options_t* defaults,
+                const custom_option_t* custom, size_t custom_count);
 
 #endif  // CORE_UTILS_COMMAND_LINE_H_
