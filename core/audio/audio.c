@@ -171,12 +171,14 @@ void play_sound(audio_context_ptr audio, int index) {
 }
 
 void set_audio_volume(audio_context_ptr audio, int volume) {
+  if (!audio) return;
   if (volume < 0) volume = 0;
   if (volume > 128) volume = 128;
   audio->volume = (float)volume / 128.0f;
 }
 
 void set_sound_enabled(audio_context_ptr audio, bool enabled) {
+  if (!audio) return;
   lock(audio);
   audio->sound_enabled = enabled;
   unlock(audio);
@@ -184,6 +186,7 @@ void set_sound_enabled(audio_context_ptr audio, bool enabled) {
 
 void set_music_source(audio_context_ptr audio, music_source_fn source,
                       void* user) {
+  if (!audio) return;
   lock(audio);
   audio->music = source;
   audio->music_user = user;
@@ -191,12 +194,14 @@ void set_music_source(audio_context_ptr audio, music_source_fn source,
 }
 
 void set_music_gain(audio_context_ptr audio, float gain) {
+  if (!audio) return;
   lock(audio);
   audio->music_gain = gain;
   unlock(audio);
 }
 
 void set_music_enabled(audio_context_ptr audio, bool enabled) {
+  if (!audio) return;
   lock(audio);
   audio->music_enabled = enabled;
   unlock(audio);

@@ -258,6 +258,19 @@ static void the_mixer_saturates_instead_of_wrapping_and_steals_voices(void) {
   for (int i = 0; i < MIXER_VOICES + 3; ++i) mixer_play(&mixer, &sample, 1.0f);
   assert(mixer_active_voices(&mixer) == MIXER_VOICES);
 }
+static void a_game_without_audio_can_still_call_every_audio_function(void) {
+  int16_t data[4] = {1, 2, 3, 4};
+  assert(!set_sound(NULL, 0, data, 4));
+  assert(!load_sound(NULL, 0, "", "missing.wav"));
+  play_sound(NULL, 0);
+  play_sound_at_volume(NULL, 0, 1.0f);
+  set_audio_volume(NULL, 64);
+  set_sound_enabled(NULL, false);
+  set_music_source(NULL, NULL, NULL);
+  set_music_gain(NULL, 0.5f);
+  set_music_enabled(NULL, false);
+  terminate_audio_context(NULL);
+}
 static void a_sound_context_copies_mixes_and_mutes_samples(void) {
   setenv("SDL_AUDIODRIVER", "dummy", 1);
   audio_context_ptr audio = init_audio_context(2, 128);
@@ -422,6 +435,8 @@ int main(int argc, char** argv) {
     the_mixer_saturates_instead_of_wrapping_and_steals_voices();
   } else if (!strcmp(argv[1], "sounds")) {
     a_sound_context_copies_mixes_and_mutes_samples();
+  } else if (!strcmp(argv[1], "no-audio")) {
+    a_game_without_audio_can_still_call_every_audio_function();
   } else if (!strcmp(argv[1], "music")) {
     a_music_source_is_mixed_with_a_gain_and_can_be_switched_off();
   } else if (!strcmp(argv[1], "wav")) {
