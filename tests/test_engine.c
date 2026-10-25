@@ -1,13 +1,16 @@
 #include <assert.h>
+#include <math.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
+#include "clock.h"
 #include "command_line.h"
 #include "events.h"
 #include "geometry.h"
 #include "physics.h"
 #include "rng.h"
+#include "stepper.h"
 #include "keyboard.h"
 #include "object_pool.h"
 #include "test_allocator.h"
@@ -131,6 +134,30 @@ static void float_rectangles_overlap_only_when_they_share_area(void) {
   assert(!frect_overlaps(a, c));
   assert(frect_right(a) == 10.0f && frect_bottom(a) == 10.0f);
 }
+static void stepper_splits_a_long_frame(void) {
+  double step;
+  int n = stepper_plan(1.0 / 30.0, 1.0 / 120.0, 0.1, &step);
+  assert(n == 4);
+  assert(fabs(step * n - 1.0 / 30.0) < 1e-9);
+  assert(step <= 1.0 / 120.0 + 1e-12);
+}
+static void stepper_caps_a_stalled_frame(void) {
+  double step;
+  int n = stepper_plan(5.0, 1.0 / 120.0, 0.1, &step);
+  assert(fabs(step * n - 0.1) < 1e-9);
+}
+static void stepper_always_runs_one_step(void) {
+  double step;
+  assert(stepper_plan(0.0, 1.0 / 120.0, 0.1, &step) == 1);
+  assert(step == 0.0);
+  assert(stepper_plan(-1.0, 1.0 / 120.0, 0.1, &step) == 1);
+  assert(step == 0.0);
+}
+static void the_clock_reports_seconds_that_do_not_go_backwards(void) {
+  double first = get_clock_seconds();
+  double second = get_clock_seconds();
+  assert(second >= first);
+}
 int main(int argc, char** argv) {
   assert(argc >= 2);
   if (!strcmp(argv[1], "parse")) {
@@ -153,6 +180,12 @@ int main(int argc, char** argv) {
     scalar_helpers_clamp_blend_and_approach();
   } else if (!strcmp(argv[1], "rectangles")) {
     float_rectangles_overlap_only_when_they_share_area();
+  } else if (!strcmp(argv[1], "stepper")) {
+    stepper_splits_a_long_frame();
+    stepper_caps_a_stalled_frame();
+    stepper_always_runs_one_step();
+  } else if (!strcmp(argv[1], "clock")) {
+    the_clock_reports_seconds_that_do_not_go_backwards();
   } else if (!strcmp(argv[1], "events")) {
     events_are_drained_even_when_quit_is_queued();
   } else {

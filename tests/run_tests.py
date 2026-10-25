@@ -88,6 +88,7 @@ def main():
         ROOT / "core/input/events.c",
         ROOT / "core/memory/object_pool.c",
         ROOT / "core/math/rng.c",
+        ROOT / "core/time/stepper.c",
         ROOT / "core/math/geometry.c",
         ROOT / "core/math/physics.c",
     ]
@@ -95,7 +96,7 @@ def main():
         ROOT / ("tests/" + name)
         for name in ("test_allocator.c", "test_clock.c", "test_engine.c")
     ]
-    cases = [(name, [name], 0) for name in ("keys", "pool", "allocation", "events", "rng", "random-geometry", "scalars", "rectangles")]
+    cases = [(name, [name], 0) for name in ("keys", "pool", "allocation", "events", "rng", "random-geometry", "scalars", "rectangles", "stepper", "clock")]
     cases += [
         ("valid options", ["parse", "--fps=120", "--volume=64", "--window-mode=0"], 0)
     ]

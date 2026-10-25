@@ -13,4 +13,7 @@
 int get_clock_ticks_ms(void);
 int elapsed_from(int ticks);
 
+/** Seconds from a high-resolution monotonic counter, for frame timing. */
+double get_clock_seconds(void);
+
 #endif  // CORE_TIME_CLOCK_H_
