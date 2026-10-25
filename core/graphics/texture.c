@@ -117,7 +117,7 @@ void set_texture_smooth(texture_ptr tex, bool smooth) {
 }
 
 void render_sprite(const graphics_context_ptr graphics_context,
-                   const texture_ptr tex, const rect_t* src_rect,
+                   const texture_t* tex, const rect_t* src_rect,
                    frect_t dst_rect, const draw_options_t* options) {
   if (!graphics_context || !tex || !tex->texture) return;
   SDL_Rect source;
