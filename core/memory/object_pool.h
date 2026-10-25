@@ -49,6 +49,17 @@ void* pool_get_at(object_pool_t* pool, size_t index);
 // Check if object at index is active
 bool pool_is_active(const object_pool_t* pool, size_t index);
 
+// Walk the active objects in index order: start with *cursor = 0; each call
+// returns the next active object and moves the cursor past it, or NULL when
+// there are no more. Releasing the object just returned is safe.
+void* pool_next_active(const object_pool_t* pool, size_t* cursor);
+
+// Index of an object that came from this pool
+size_t pool_index_of(const object_pool_t* pool, const void* object);
+
+// Release an object by pointer (releasing twice is harmless)
+void pool_release_object(object_pool_t* pool, const void* object);
+
 // Destroy pool and free all memory
 void pool_destroy(object_pool_t* pool);
 

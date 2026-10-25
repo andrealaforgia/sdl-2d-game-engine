@@ -72,6 +72,31 @@ static void pools_release_storage_and_reuse_slots(void) {
   pool_destroy(&pool);
   assert(outstanding_allocations() == 0);
 }
+static void pools_can_be_walked_and_released_by_object(void) {
+  object_pool_t pool = create_object_pool(sizeof(int), 4);
+  int* values[4];
+  for (int i = 0; i < 4; ++i) {
+    values[i] = pool_acquire(&pool, NULL);
+    assert(values[i]);
+    *values[i] = i * 10;
+  }
+  pool_release_object(&pool, values[1]);
+  pool_release_object(&pool, values[1]);  // twice is harmless
+  assert(pool_get_active_count(&pool) == 3);
+  assert(pool_index_of(&pool, values[2]) == 2);
+  size_t cursor = 0;
+  int seen = 0, sum = 0;
+  for (int* value; (value = pool_next_active(&pool, &cursor));) {
+    ++seen;
+    sum += *value;
+  }
+  assert(seen == 3 && sum == 0 + 20 + 30);
+  assert(pool_next_active(&pool, &cursor) == NULL);
+  // Released slots come back to be acquired again, zeroed.
+  int* again = pool_acquire(&pool, NULL);
+  assert(again == values[1] && *again == 0);
+  pool_destroy(&pool);
+}
 static void failed_pool_allocations_release_partial_storage(void) {
   for (int allocation = 0; allocation < 3; ++allocation) {
     fail_allocation_after(allocation);
@@ -409,6 +434,8 @@ int main(int argc, char** argv) {
     keys_map_to_buttons_and_may_share_a_key();
   } else if (!strcmp(argv[1], "pool")) {
     pools_release_storage_and_reuse_slots();
+  } else if (!strcmp(argv[1], "pool-walk")) {
+    pools_can_be_walked_and_released_by_object();
   } else if (!strcmp(argv[1], "allocation")) {
     failed_pool_allocations_release_partial_storage();
   } else if (!strcmp(argv[1], "rng")) {

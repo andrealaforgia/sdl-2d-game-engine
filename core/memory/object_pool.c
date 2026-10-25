@@ -137,3 +137,23 @@ void pool_foreach_active(object_pool_t* pool, pool_callback_t callback,
     }
   }
 }
+
+void* pool_next_active(const object_pool_t* pool, size_t* cursor) {
+  for (size_t i = *cursor; i < pool->capacity; i++) {
+    if (pool->active_flags[i]) {
+      *cursor = i + 1;
+      return (char*)pool->objects + (i * pool->object_size);
+    }
+  }
+  *cursor = pool->capacity;
+  return NULL;
+}
+
+size_t pool_index_of(const object_pool_t* pool, const void* object) {
+  return (size_t)((const char*)object - (const char*)pool->objects) /
+         pool->object_size;
+}
+
+void pool_release_object(object_pool_t* pool, const void* object) {
+  pool_release(pool, pool_index_of(pool, object));
+}
