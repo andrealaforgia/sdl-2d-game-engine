@@ -33,7 +33,7 @@ pixel_font_t build_pixel_font(const graphics_context_ptr graphics_context) {
   return font;
 }
 
-void render_pixel_text(const pixel_font_ptr font,
+void render_pixel_text(const pixel_font_t* font,
                        const graphics_context_ptr graphics_context, float x,
                        float y, const char* text, float scale, uint8_t r,
                        uint8_t g, uint8_t b) {
