@@ -17,7 +17,7 @@
 #define FPS "--fps="
 #define VOLUME "--volume="
 
-void print_help(void) {
+void print_help(const custom_option_t* custom, size_t custom_count) {
   puts("\noptions:");
   puts("\t" HELP ": print this help");
   puts("\t" GRAPHICS_INFO ": print info about the graphics system");
@@ -33,6 +33,10 @@ void print_help(void) {
        " to show all available display modes)");
   puts("\t" WINDOW_MODE
        "N: window mode (0=windowed, 1=fullscreen, 2=borderless, 3=maximized)");
+  for (size_t i = 0; i < custom_count; ++i) {
+    const char* value = custom[i].kind == OPTION_FLAG ? "" : "=X";
+    printf("\t--%s%s: %s\n", custom[i].name, value, custom[i].help);
+  }
   printf("\n");
 }
 
@@ -54,6 +58,52 @@ static int extract_numeric_argument(const char* prefix, const char* argument,
     return 1;
   }
   return 0;
+}
+
+static void fail_on(const char* what, const char* argument) {
+  fprintf(stderr, "Error: %s '%s'\n", what, argument);
+  fprintf(stderr, "Use --help to see all available options\n");
+  exit(EXIT_FAILURE);
+}
+
+// Returns true if the argument is one of the game's own options
+static bool parse_custom_argument(const char* argument,
+                                  const custom_option_t* custom,
+                                  size_t custom_count) {
+  if (strncmp(argument, "--", 2) != 0) return false;
+  const char* name = argument + 2;
+  const char* equals = strchr(name, '=');
+  size_t name_length = equals ? (size_t)(equals - name) : strlen(name);
+  for (size_t i = 0; i < custom_count; ++i) {
+    const custom_option_t* option = &custom[i];
+    if (strlen(option->name) != name_length ||
+        strncmp(option->name, name, name_length) != 0)
+      continue;
+    if (option->kind == OPTION_FLAG) {
+      if (equals) fail_on("Option takes no value:", argument);
+      *(bool*)option->target = true;
+      return true;
+    }
+    if (!equals || !equals[1]) fail_on("Option needs a value:", argument);
+    const char* value = equals + 1;
+    char* end;
+    errno = 0;
+    if (option->kind == OPTION_STRING) {
+      *(const char**)option->target = value;
+    } else if (option->kind == OPTION_INT) {
+      long number = strtol(value, &end, 10);
+      if (errno == ERANGE || *end != '\0' || number < 0 || number > INT_MAX)
+        fail_on("Invalid numeric option", argument);
+      *(int*)option->target = (int)number;
+    } else {
+      double number = strtod(value, &end);
+      if (errno == ERANGE || *end != '\0' || !(number >= 0.0))
+        fail_on("Invalid numeric option", argument);
+      *(float*)option->target = (float)number;
+    }
+    return true;
+  }
+  return false;
 }
 
 // Returns true if the argument was recognized, false otherwise
@@ -102,7 +152,9 @@ static bool parse_argument(const char* argument,
   return true;
 }
 
-static void set_defaults(const command_line_options_ptr options) {
+command_line_options_t default_command_line_options(void) {
+  command_line_options_t defaults;
+  command_line_options_ptr options = &defaults;
   options->help = false;
   options->graphics_info = false;
   options->show_fps = false;
@@ -112,24 +164,23 @@ static void set_defaults(const command_line_options_ptr options) {
   options->window_mode = FULLSCREEN;  // Default to fullscreen
   options->fps = 60;
   options->volume = 32;  // Default volume (0-128 range)
+  return defaults;
 }
 
-command_line_options_t parse_command_line_options(int argc, char* argv[]) {
-  command_line_options_t options;
-  set_defaults(&options);
-
+void parse_command_line_options(int argc, char* argv[],
+                                command_line_options_ptr options,
+                                const custom_option_t* custom,
+                                size_t custom_count) {
   // Skip argv[0] which is the program name
   for (int i = 1; i < argc; i++) {
-    if (!parse_argument(argv[i], &options)) {
-      // Unrecognized argument
-      if (strncmp(argv[i], "--", 2) == 0 || strncmp(argv[i], "-", 1) == 0) {
-        fprintf(stderr, "Error: Unknown option '%s'\n", argv[i]);
-        fprintf(stderr, "Use --help to see all available options\n");
-        exit(EXIT_FAILURE);
-      }
-      // Not an option (doesn't start with --), ignore it
+    if (parse_argument(argv[i], options)) continue;
+    if (parse_custom_argument(argv[i], custom, custom_count)) continue;
+    // Unrecognized argument
+    if (strncmp(argv[i], "-", 1) == 0) {
+      fprintf(stderr, "Error: Unknown option '%s'\n", argv[i]);
+      fprintf(stderr, "Use --help to see all available options\n");
+      exit(EXIT_FAILURE);
     }
+    // Not an option (doesn't start with a dash), ignore it
   }
-
-  return options;
 }

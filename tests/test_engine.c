@@ -177,13 +177,37 @@ static void the_clock_reports_seconds_that_do_not_go_backwards(void) {
   double second = get_clock_seconds();
   assert(second >= first);
 }
+static void games_can_register_their_own_options(int argc, char** argv) {
+  bool title = false, flag_seen = false;
+  int seed = 1, width = 0;
+  float seconds = 4.0f;
+  const char* snapshot = NULL;
+  const custom_option_t custom[] = {
+      {"snapshot", OPTION_STRING, &snapshot, "save a frame"},
+      {"seed", OPTION_INT, &seed, "random seed"},
+      {"width", OPTION_INT, &width, "window width"},
+      {"seconds", OPTION_FLOAT, &seconds, "how long to play"},
+      {"title", OPTION_FLAG, &title, "show the title"},
+      {"other", OPTION_FLAG, &flag_seen, "another flag"},
+  };
+  command_line_options_t options = default_command_line_options();
+  options.window_mode = WINDOWED;
+  parse_command_line_options(argc, argv, &options, custom, 6);
+  assert(options.window_mode == WINDOWED);
+  assert(options.fps == 30);
+  assert(seed == 7 && width == 800 && title && !flag_seen);
+  assert(seconds > 2.4f && seconds < 2.6f);
+  assert(snapshot && !strcmp(snapshot, "out.bmp"));
+}
 int main(int argc, char** argv) {
   assert(argc >= 2);
   if (!strcmp(argv[1], "parse")) {
-    command_line_options_t options =
-        parse_command_line_options(argc - 1, argv + 1);
+    command_line_options_t options = default_command_line_options();
+    parse_command_line_options(argc - 1, argv + 1, &options, NULL, 0);
     printf("fps=%d volume=%d mode=%d\n", options.fps, options.volume,
            options.window_mode);
+  } else if (!strcmp(argv[1], "custom")) {
+    games_can_register_their_own_options(argc - 1, argv + 1);
   } else if (!strcmp(argv[1], "controls")) {
     controls_report_edges_once();
   } else if (!strcmp(argv[1], "keys")) {

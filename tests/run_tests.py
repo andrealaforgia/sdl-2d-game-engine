@@ -101,6 +101,14 @@ def main():
     cases += [
         ("valid options", ["parse", "--fps=120", "--volume=64", "--window-mode=0"], 0)
     ]
+    cases += [
+        (
+            "custom options",
+            ["custom", "--snapshot=out.bmp", "--seed=7", "--width=800",
+             "--seconds=2.5", "--title", "--fps=30"],
+            0,
+        )
+    ]
     malformed = [
         "--fps=60junk",
         "--volume=garbage",
@@ -110,6 +118,12 @@ def main():
         "--display=-1",
         "--display-mode=1junk",
         "--fps=9999999999999999999999999999",
+    ]
+    cases += [
+        ("unknown option", ["parse", "--bogus"], 1),
+        ("custom int garbage", ["custom", "--seed=abc"], 1),
+        ("custom float garbage", ["custom", "--seconds=1.5x"], 1),
+        ("custom string needs a value", ["custom", "--snapshot="], 1),
     ]
     cases += [(value, ["parse", value], 1) for value in malformed]
     failures = 0
