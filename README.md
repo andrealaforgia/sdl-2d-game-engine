@@ -272,6 +272,7 @@ render_sprite(&graphics, &sprite, NULL, make_frect(10, 20, 64, 64), &flipped);
 draw_filled_rect_alpha(&graphics, 0, 0, 200, 40, COLOR(10, 10, 30), 140);
 pixel_font_t font = build_pixel_font(&graphics);
 render_pixel_text(&font, &graphics, 14, 8, "SCORE 000100", 3.0f, 255, 240, 120);
+render_pixel_text_alpha(&font, &graphics, 14, 40, "+200", 3.0f, 255, 240, 120, 0.5f); // half faded
 present_frame(&graphics);
 ```
 

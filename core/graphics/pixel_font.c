@@ -33,12 +33,12 @@ pixel_font_t build_pixel_font(const graphics_context_ptr graphics_context) {
   return font;
 }
 
-void render_pixel_text(const pixel_font_t* font,
-                       const graphics_context_ptr graphics_context, float x,
-                       float y, const char* text, float scale, uint8_t r,
-                       uint8_t g, uint8_t b) {
+void render_pixel_text_alpha(const pixel_font_t* font,
+                             const graphics_context_ptr graphics_context,
+                             float x, float y, const char* text, float scale,
+                             uint8_t r, uint8_t g, uint8_t b, float alpha) {
   if (!font || !font->atlas.texture || !text) return;
-  draw_options_t options = {false, 1.0f, 0.0f, true, r, g, b};
+  draw_options_t options = {false, alpha, 0.0f, true, r, g, b};
   float cursor = x;
   for (const char* p = text; *p; p++) {
     int index = (unsigned char)*p - GLYPH_FIRST;
@@ -53,6 +53,14 @@ void render_pixel_text(const pixel_font_t* font,
     }
     cursor += GLYPH_CELL_W * scale;
   }
+}
+
+void render_pixel_text(const pixel_font_t* font,
+                       const graphics_context_ptr graphics_context, float x,
+                       float y, const char* text, float scale, uint8_t r,
+                       uint8_t g, uint8_t b) {
+  render_pixel_text_alpha(font, graphics_context, x, y, text, scale, r, g, b,
+                          1.0f);
 }
 
 float pixel_text_width(const char* text, float scale) {

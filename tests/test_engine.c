@@ -405,6 +405,8 @@ static void a_headless_window_scales_draws_and_saves_frames(void) {
   pixel_font_t font = build_pixel_font(&graphics);
   assert(font.atlas.texture);
   render_pixel_text(&font, &graphics, 4.0f, 4.0f, "Hi 12", 2.0f, 255, 255, 0);
+  render_pixel_text_alpha(&font, &graphics, 4.0f, 24.0f, "+200", 2.0f, 255, 255, 0, 0.5f);
+  render_pixel_text_alpha(&font, &graphics, 4.0f, 44.0f, "", 2.0f, 255, 255, 0, 0.0f);
   const char* directory = getenv("TMPDIR") ? getenv("TMPDIR") : "/tmp";
   char path[512];
   snprintf(path, sizeof(path), "%s/engine-test-frame.bmp", directory);

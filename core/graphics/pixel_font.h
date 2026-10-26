@@ -27,6 +27,12 @@ void render_pixel_text(const pixel_font_t* font,
                        float y, const char* text, float scale, uint8_t r,
                        uint8_t g, uint8_t b);
 
+/** As render_pixel_text, drawn `alpha` opaque (0..1, where 0 counts as 1). */
+void render_pixel_text_alpha(const pixel_font_t* font,
+                             const graphics_context_ptr graphics_context,
+                             float x, float y, const char* text, float scale,
+                             uint8_t r, uint8_t g, uint8_t b, float alpha);
+
 /** The width `text` takes at `scale`, without the gap after the last glyph. */
 float pixel_text_width(const char* text, float scale);
 
